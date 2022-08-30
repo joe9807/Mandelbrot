@@ -65,9 +65,12 @@ public class Mandelbrot {
 	private void mandelbrot(GC gc) {
 		double x = -2;
 		double y = -1;
+		
+		int halfWidth = WIDTH/2;
+		int halfHeight = HEIGHT/2;
 		while (true) {
-			int pointx = (int)(x*SCALE)+WIDTH/2;
-			int pointy = (int)(y*SCALE)+HEIGHT/2;
+			int pointx = (int)(x*SCALE)+halfWidth;
+			int pointy = (int)(y*SCALE)+halfHeight;
 			
 			setBackground(gc, getPrecision(x, y));
 			gc.drawPoint(pointx, pointy);
