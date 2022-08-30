@@ -5,21 +5,18 @@ import java.util.Date;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
-import org.eclipse.swt.events.ShellAdapter;
-import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
 public class Mandelbrot {
 	private static int HEIGHT = 1000;
-	private static int WIDTH = 1700;
+	private static int WIDTH = 3*HEIGHT/2;
+	private static int SCALE = WIDTH/4;
 	private static int PRECISION = 200;
-	private static double SCALE = 400;
 	private static double STEP = 0.002;
+	private int[][] points = new int[WIDTH][HEIGHT];
 	
 	private static Mandelbrot instance;
 	
@@ -34,39 +31,28 @@ public class Mandelbrot {
 	
 	
 	private void run () {
-		Shell shell = new Shell(Display.getCurrent(), SWT.CLOSE);
+		Display display = new Display();
+		Shell shell = new Shell(display, SWT.CLOSE | SWT.BORDER);
 		shell.setText("Mandelbrot");
 		shell.setBounds(0, 0, WIDTH, HEIGHT);
-		shell.setLayout(new FillLayout());
 		
-        shell.addShellListener(new ShellAdapter() {
-        	@Override
-            public void shellActivated(ShellEvent shellevent) {
-                draw(shell);
-            }
-        });
+        shell.addPaintListener(new PaintListener() {
+			@Override
+			public void paintControl(PaintEvent e) {
+				mandelbrot(e.gc);
+			}
+		});
 		shell.open();
 		
 		while (!shell.isDisposed()) {
-			if (!shell.getDisplay().readAndDispatch()) {
-				shell.getDisplay().sleep();
+			if (!display.readAndDispatch()) {
+				display.sleep();
 			}	
 		}
 	}
 	
-	private void draw(Shell shell) {
-		Canvas canvas = new Canvas(shell, SWT.BORDER);
-		canvas.addPaintListener(new PaintListener() {
-			@Override
-			public void paintControl(PaintEvent e) {
-				Date date = new Date();
-				mandelbrot(e.gc);
-				System.out.println(getTimeElapsed(new Date().getTime()-date.getTime()));
-			}
-		});
-	}
-	
 	private void mandelbrot(GC gc) {
+		Date date = new Date();
 		double x = -2;
 		double y = -1;
 		
@@ -76,15 +62,28 @@ public class Mandelbrot {
 			int pointx = (int)(x*SCALE)+halfWidth;
 			int pointy = (int)(y*SCALE)+halfHeight;
 			
-			setBackground(gc, getPrecision(x, y));
-			gc.drawPoint(pointx, pointy);
+			points[pointx][pointy] = getPrecision(x, y);
 			
 			x+=STEP;
 			if (x>=1 && y>=1) break;
 			
-			if (x>1) {
+			if (x>=1) {
 				x = -2;
 				y+=STEP;
+			}
+		}
+		
+		System.out.println("Calculating took: "+getTimeElapsed(new Date().getTime()-date.getTime()));
+		date = new Date();
+		drawPoints(gc);
+		System.out.println("Rendering took: "+getTimeElapsed(new Date().getTime()-date.getTime()));
+	}
+	
+	private void drawPoints(GC gc) {
+		for (int i=0;i<WIDTH;i++) {
+			for (int j=0;j<HEIGHT;j++) {
+				setForeground(gc, points[i][j]);
+				gc.drawPoint(i, j);
 			}
 		}
 	}
@@ -94,7 +93,7 @@ public class Mandelbrot {
 		double yn = y;
 		int i=0;
 		for (;i<PRECISION;i++) {
-			if (module(xn, yn)>4) break;//not in set
+			if (module(xn, yn)>4) break;//definitely not in set
 			
 			double xn1 = xn*xn-yn*yn+x;
 			yn = 2*xn*yn+y;
@@ -105,12 +104,15 @@ public class Mandelbrot {
 		return module(xn, yn)<4?0:i;//in set/not in set
 	}
 	
-	private void setBackground(GC gc, int value) {
-		if (value <= 0) {//in the set
-			gc.setForeground(new Color(gc.getDevice(), 0, 0, 0));
-		} else {//near to the set
-			int color = (value*255)/PRECISION;
-			gc.setForeground(new Color(gc.getDevice(), color, color, color));
+	private void setForeground(GC gc, int value) {
+		Color color = new Color(gc.getDevice(), 0, 0, 0);
+		if (value > 0) {//near to the set
+			int rgb = (value*255)/PRECISION;
+			color = new Color(gc.getDevice(), rgb, rgb, rgb);
+		}
+		
+		if (gc.getForeground() != color) {
+			gc.setForeground(color);
 		}
 	}
 	
