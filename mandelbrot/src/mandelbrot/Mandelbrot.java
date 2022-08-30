@@ -15,7 +15,7 @@ import org.eclipse.swt.widgets.Shell;
 public class Mandelbrot {
 	private static int HEIGHT = 1000;
 	private static int WIDTH = 1700;
-	private static int PRECISION = 255;
+	private static int PRECISION = 200;
 	private static double SCALE = 400;
 	private static double STEP = 0.002;
 	
@@ -55,12 +55,10 @@ public class Mandelbrot {
 	private void draw(Shell shell) {
 		Canvas canvas = new Canvas(shell, SWT.BORDER);
 		canvas.addPaintListener(new PaintListener() {
-
 			@Override
 			public void paintControl(PaintEvent e) {
 				mandelbrot(e.gc);
 			}
-			
 		});
 	}
 	
@@ -68,11 +66,11 @@ public class Mandelbrot {
 		double x = -2;
 		double y = -1;
 		while (true) {
-			int value = isInSet(x, y);
+			int precision = getPrecision(x, y);
 			int pointx = (int)(x*SCALE)+WIDTH/2;
 			int pointy = (int)(y*SCALE)+HEIGHT/2;
 			
-			setBackground(gc, value);
+			setBackground(gc, precision);
 			gc.drawPoint(pointx, pointy);
 			
 			x+=STEP;
@@ -85,26 +83,25 @@ public class Mandelbrot {
 		}
 	}
 	
-	private int isInSet(double x, double y) {
+	private int getPrecision(double x, double y) {
 		double xn = x;
 		double yn = y;
 		int i=0;
 		for (;i<PRECISION;i++) {
+			if (module(xn, yn)>4) return i;//not in set
+			
 			double xn1 = xn*xn-yn*yn+x;
 			double yn1 = 2*xn*yn+y;
 			
 			xn = xn1;
 			yn = yn1;
-			if (module(xn, yn)>4) return i;//not in set
 		}
 		
 		return module(xn, yn)<4?-1:i;//in set/not in set
 	}
 	
 	private void setBackground(GC gc, int value) {
-		if (value <0 ) {//in the set
-			gc.setForeground(new Color(gc.getDevice(), 0, 0, 0));
-		} else if (value == 0) {//definitely not in set
+		if (value <=0) {//in the set
 			gc.setForeground(new Color(gc.getDevice(), 0, 0, 0));
 		} else {//near to the set
 			int color = (value*255)/PRECISION;
