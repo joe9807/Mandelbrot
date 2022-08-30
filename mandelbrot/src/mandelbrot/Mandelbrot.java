@@ -66,11 +66,10 @@ public class Mandelbrot {
 		double x = -2;
 		double y = -1;
 		while (true) {
-			int precision = getPrecision(x, y);
 			int pointx = (int)(x*SCALE)+WIDTH/2;
 			int pointy = (int)(y*SCALE)+HEIGHT/2;
 			
-			setBackground(gc, precision);
+			setBackground(gc, getPrecision(x, y));
 			gc.drawPoint(pointx, pointy);
 			
 			x+=STEP;
@@ -88,7 +87,7 @@ public class Mandelbrot {
 		double yn = y;
 		int i=0;
 		for (;i<PRECISION;i++) {
-			if (module(xn, yn)>4) return i;//not in set
+			if (module(xn, yn)>4) break;//not in set
 			
 			double xn1 = xn*xn-yn*yn+x;
 			double yn1 = 2*xn*yn+y;
@@ -101,7 +100,7 @@ public class Mandelbrot {
 	}
 	
 	private void setBackground(GC gc, int value) {
-		if (value <=0) {//in the set
+		if (value <= 0) {//in the set
 			gc.setForeground(new Color(gc.getDevice(), 0, 0, 0));
 		} else {//near to the set
 			int color = (value*255)/PRECISION;
