@@ -90,13 +90,12 @@ public class Mandelbrot {
 			if (module(xn, yn)>4) break;//not in set
 			
 			double xn1 = xn*xn-yn*yn+x;
-			double yn1 = 2*xn*yn+y;
+			yn = 2*xn*yn+y;
 			
 			xn = xn1;
-			yn = yn1;
 		}
 		
-		return module(xn, yn)<4?-1:i;//in set/not in set
+		return module(xn, yn)<4?0:i;//in set/not in set
 	}
 	
 	private void setBackground(GC gc, int value) {
