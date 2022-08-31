@@ -11,18 +11,31 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
 public class Mandelbrot {
-	private static int HEIGHT = 1000;
-	private static int WIDTH = 3*HEIGHT/2;
-	private static int SCALE = WIDTH/4;
-	private static int PRECISION = 200;
-	private static double STEP = 0.002;
-	private int[][] points = new int[WIDTH][HEIGHT];
+	private int height;
+	private int width;
+	private int scale;
+	private int iterations;
+	private double step;
+	private int[][] points;
 	
 	private static Mandelbrot instance;
 	
 	private static synchronized Mandelbrot getInstance() {
 		if (instance == null) instance = new Mandelbrot();
 		return instance;
+	}
+	
+	public void init() {
+		height = Display.getCurrent().getClientArea().height;
+		width = 3*height/2;
+		scale = width/4;
+		iterations = height/3;
+		step = 0.002;
+		points = new int[width][height];
+	}
+	
+	public String toString() {
+		return String.format("height: %s; width; %s; scale: %s; iterations: %s; step: %s", height, width, scale, iterations, step);
 	}
 
 	public static void main(String[] args) {
@@ -32,9 +45,12 @@ public class Mandelbrot {
 	
 	private void run () {
 		Display display = new Display();
+		
+		init();
+		
 		Shell shell = new Shell(display, SWT.CLOSE | SWT.BORDER);
 		shell.setText("Mandelbrot");
-		shell.setBounds(0, 0, WIDTH, HEIGHT);
+		shell.setBounds(0, 0, width, height);
 		
         shell.addPaintListener(new PaintListener() {
 			@Override
@@ -54,22 +70,22 @@ public class Mandelbrot {
 	private void mandelbrot(GC gc) {
 		Date date = new Date();
 		double x = -2;
-		double y = -1;
+		double y = -1.2;
 		
-		int halfWidth = WIDTH/2;
-		int halfHeight = HEIGHT/2;
+		int halfWidth = width/2;
+		int halfHeight = height/2;
 		while (true) {
-			int pointx = (int)(x*SCALE)+halfWidth;
-			int pointy = (int)(y*SCALE)+halfHeight;
+			int pointx = (int)(x*scale)+halfWidth;
+			int pointy = (int)(y*scale)+halfHeight;
 			
 			points[pointx][pointy] = getPrecision(x, y);
 			
-			x+=STEP;
-			if (x>=1 && y>=1) break;
+			x+=step;
+			if (x>=1 && y>=1.2) break;
 			
 			if (x>=1) {
 				x = -2;
-				y+=STEP;
+				y+=step;
 			}
 		}
 		
@@ -77,11 +93,12 @@ public class Mandelbrot {
 		date = new Date();
 		drawPoints(gc);
 		System.out.println("Rendering took: "+getTimeElapsed(new Date().getTime()-date.getTime()));
+		System.out.println(this);
 	}
 	
 	private void drawPoints(GC gc) {
-		for (int i=0;i<WIDTH;i++) {
-			for (int j=0;j<HEIGHT;j++) {
+		for (int i=0;i<width;i++) {
+			for (int j=0;j<height;j++) {
 				setForeground(gc, points[i][j]);
 				gc.drawPoint(i, j);
 			}
@@ -92,7 +109,7 @@ public class Mandelbrot {
 		double xn = x;
 		double yn = y;
 		int i=0;
-		for (;i<PRECISION;i++) {
+		for (;i<iterations;i++) {
 			if (module(xn, yn)>4) break;//definitely not in set
 			
 			double xn1 = xn*xn-yn*yn+x;
@@ -107,7 +124,7 @@ public class Mandelbrot {
 	private void setForeground(GC gc, int value) {
 		Color color = new Color(gc.getDevice(), 0, 0, 0);
 		if (value > 0) {//near to the set
-			int rgb = (value*255)/PRECISION;
+			int rgb = (value*255)/iterations;
 			color = new Color(gc.getDevice(), rgb, rgb, rgb);
 		}
 		
