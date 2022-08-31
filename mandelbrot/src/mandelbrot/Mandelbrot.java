@@ -41,8 +41,8 @@ public class Mandelbrot {
 	}
 	
 	public String toString() {
-		return String.format("height: %s; width; %s; scale: %s; iterations: %s; step: %s; \n", height, width, scale, iterations, step)+
-				String.format("x1: %s; x2: %s;\n y1: %s; y2: %s", x1, x2, y1, y2);
+		return String.format("height: %s; width; %s; scale: %s; iterations: %s; step: %s;\n", height, width, scale, iterations, step)+
+				String.format(" x1: %s; x2: %s;\n y1: %s; y2: %s;", x1, x2, y1, y2);
 	}
 
 	public static void main(String[] args) {
@@ -79,8 +79,8 @@ public class Mandelbrot {
 		double x = x1;
 		double y = y1;
 		
-		int halfWidth = 2*width/3;
-		int halfHeight = height/2;
+		int halfWidth = 2*width/3;//-(int)(scale*x1);
+		int halfHeight = height/2;//-(int)(scale*y1);
 		while (true) {
 			int pointx = (int)(x*scale)+halfWidth;
 			int pointy = (int)(y*scale)+halfHeight;
