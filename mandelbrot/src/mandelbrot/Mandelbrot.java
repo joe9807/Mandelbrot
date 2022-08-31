@@ -35,7 +35,7 @@ public class Mandelbrot {
 		height = Display.getCurrent().getClientArea().height-50;
 		width = Double.valueOf((x2-x1)*height/(y2-y1)).intValue();
 		scale = Double.valueOf(height/(x2-x1)).intValue();
-		iterations = height/3;
+		iterations = 200;
 		step = 0.002;
 		points = new int[width][height];
 	}
