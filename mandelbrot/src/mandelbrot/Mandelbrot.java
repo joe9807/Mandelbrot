@@ -15,6 +15,12 @@ public class Mandelbrot {
 	private int width;
 	private int scale;
 	private int iterations;
+	
+	private double x1= -2;
+	private double x2 = 1;
+	private double y1 = -1.2;
+	private double y2 = 1.2;
+	
 	private double step;
 	private int[][] points;
 	
@@ -26,16 +32,17 @@ public class Mandelbrot {
 	}
 	
 	public void init() {
-		height = Display.getCurrent().getClientArea().height;
-		width = 3*height/2;
-		scale = width/4;
+		height = Display.getCurrent().getClientArea().height-50;
+		width = Double.valueOf((x2-x1)*height/(y2-y1)).intValue();
+		scale = Double.valueOf(height/(x2-x1)).intValue();
 		iterations = height/3;
 		step = 0.002;
 		points = new int[width][height];
 	}
 	
 	public String toString() {
-		return String.format("height: %s; width; %s; scale: %s; iterations: %s; step: %s", height, width, scale, iterations, step);
+		return String.format("height: %s; width; %s; scale: %s; iterations: %s; step: %s; \n", height, width, scale, iterations, step)+
+				String.format("x1: %s; x2: %s;\n y1: %s; y2: %s", x1, x2, y1, y2);
 	}
 
 	public static void main(String[] args) {
@@ -49,7 +56,7 @@ public class Mandelbrot {
 		init();
 		
 		Shell shell = new Shell(display, SWT.CLOSE | SWT.BORDER);
-		shell.setText("Mandelbrot");
+		shell.setText("Mandelbrot ------ "+this);
 		shell.setBounds(0, 0, width, height);
 		
         shell.addPaintListener(new PaintListener() {
@@ -69,10 +76,10 @@ public class Mandelbrot {
 	
 	private void mandelbrot(GC gc) {
 		Date date = new Date();
-		double x = -2;
-		double y = -1.2;
+		double x = x1;
+		double y = y1;
 		
-		int halfWidth = width/2;
+		int halfWidth = 2*width/3;
 		int halfHeight = height/2;
 		while (true) {
 			int pointx = (int)(x*scale)+halfWidth;
@@ -81,10 +88,10 @@ public class Mandelbrot {
 			points[pointx][pointy] = getPrecision(x, y);
 			
 			x+=step;
-			if (x>=1 && y>=1.2) break;
+			if (x>=x2 && y>=y2) break;
 			
-			if (x>=1) {
-				x = -2;
+			if (x>=x2) {
+				x = x1;
 				y+=step;
 			}
 		}
