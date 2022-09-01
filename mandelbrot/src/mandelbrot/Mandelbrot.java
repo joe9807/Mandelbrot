@@ -116,7 +116,7 @@ public class Mandelbrot {
 	
 	private void drawImage(Shell shell) {
 		shell.setText("Calculating ");
-		ImageData imageData = new ImageData(parameters.getWidth()+1, parameters.getHeight()+1, 24, new PaletteData(0xFF , 0xFF00 , 0xFF0000));
+		ImageData imageData = new ImageData(parameters.getWidth(), parameters.getHeight(), 24, new PaletteData(0xFF , 0xFF00 , 0xFF0000));
 		
 		Date date = new Date();
 		mandelbrot(imageData);
@@ -136,7 +136,12 @@ public class Mandelbrot {
 		double y = parameters.getY1();
 		
 		while (true) {
-			imageData.setPixel(parameters.getScaledX(x), parameters.getScaledY(y), MandelbrotUtils.getColor(getIterations(x, y), parameters.getMaxIterations()));
+			int scaledX = parameters.getScaledX(x);
+			int scaledY = parameters.getScaledY(y);
+			
+			if (scaledX<imageData.width && scaledY<imageData.height) {
+				imageData.setPixel(scaledX, scaledY, MandelbrotUtils.getColor(getIterations(x, y), parameters.getMaxIterations()));
+			}
 			
 			x+=parameters.getStep();
 			if (x>=parameters.getX2()) {
@@ -145,8 +150,7 @@ public class Mandelbrot {
 				x = parameters.getX1();
 				y+=parameters.getStep();
 			}
-		}
-		
+		}	
 	}
 	
 	private int getIterations(double x, double y) {
