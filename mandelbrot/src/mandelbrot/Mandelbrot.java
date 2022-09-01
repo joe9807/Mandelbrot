@@ -60,7 +60,7 @@ public class Mandelbrot {
 				
 				parameters.change(xn1, yn1, xn2, yn2);
 				
-				//shell.redraw();
+				shell.setBounds(0, 0, parameters.getWidth(), parameters.getHeight());
 			}
         });
         
@@ -94,7 +94,7 @@ public class Mandelbrot {
 			int scaledY = parameters.getScaledY(y);
 			
 			if (scaledX<imageData.width && scaledY<imageData.height) {
-				imageData.setPixel(scaledX, scaledY, MandelbrotUtils.setForeground(getIterations(x, y), parameters.getMaxIterations()));
+				imageData.setPixel(scaledX, scaledY, MandelbrotUtils.getColor(getIterations(x, y), parameters.getMaxIterations()));
 			}
 			
 			x+=parameters.getStep();

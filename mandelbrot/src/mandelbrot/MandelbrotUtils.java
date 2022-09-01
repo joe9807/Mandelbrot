@@ -1,7 +1,7 @@
 package mandelbrot;
 
 public class MandelbrotUtils {
-	public static int setForeground(int iterations, int maxIterations) {
+	public static int getColor(int iterations, int maxIterations) {
 		int color = 0;
 		if (iterations > 0) {//near to the set
 			int rgb = (iterations*255)/maxIterations;
