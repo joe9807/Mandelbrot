@@ -9,13 +9,14 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.PaletteData;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
 public class Mandelbrot {
 	private static Mandelbrot instance;
-	private MandelbrotParameters parameters = new MandelbrotParameters();
+	private MandelbrotParameters parameters;
 	
 	private static synchronized Mandelbrot getInstance() {
 		if (instance == null) instance = new Mandelbrot();
@@ -32,6 +33,7 @@ public class Mandelbrot {
 	
 	private void run () {
 		Shell shell = new Shell(new Display(), SWT.CLOSE);
+		parameters = new MandelbrotParameters(shell.getDisplay().getPrimaryMonitor().getClientArea().height-20);
 		shell.setBounds(0, 0, parameters.getWidth(), parameters.getHeight());
 		shell.setLayout(new FillLayout());
         shell.addMouseListener(new MouseListener() {
@@ -53,7 +55,8 @@ public class Mandelbrot {
 				xn2 = parameters.getUnScaledX(e.x);
 				yn2 = parameters.getUnScaledY(e.y);
 				
-				parameters.change(xn1, yn1, xn2, yn2);
+				final Rectangle rect = shell.getDisplay().getPrimaryMonitor().getClientArea();
+				parameters.change(xn1, yn1, xn2, yn2, Double.valueOf(rect.width)/rect.height);
 				
 				shell.setBounds(0, 0, parameters.getWidth(), parameters.getHeight());
 				

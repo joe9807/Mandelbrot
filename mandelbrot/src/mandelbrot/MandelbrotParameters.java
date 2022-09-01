@@ -6,7 +6,7 @@ import lombok.Data;
 public class MandelbrotParameters {
 	private int height;
 	private int width;
-	private long scale = 400;
+	private double scale;
 	private long maxIterations = 200;
 	
 	private double x1= -2;
@@ -16,12 +16,18 @@ public class MandelbrotParameters {
 	
 	private double step = 0.002;
 	
-	public MandelbrotParameters() {
-		init();
+	public MandelbrotParameters(int initialHeight) {
+		init(initialHeight);
 	}
 	
-	public void init() {
-		height = (int)((y2-y1)*scale);
+	public void init(int initialHeight) {
+		if (initialHeight != 0) {
+			scale = initialHeight/(y2-y1);
+			height = initialHeight;
+		} else {
+			height = (int)((y2-y1)*scale);
+		}
+		
 		width = (int)((x2-x1)*scale);
 	}
 	
@@ -41,8 +47,9 @@ public class MandelbrotParameters {
 		return (y/scale)+y1;
 	}
 	
-	public void change(double xn1, double yn1, double xn2, double yn2) {
-		double before = x2-x1;
+	public void change(double xn1, double yn1, double xn2, double yn2, double ratioWidthToHeight) {
+		double beforeX = x2-x1;
+		double beforeY = y2-y1;
 		
 		if (xn1<xn2) {
 			x1 = xn1;
@@ -60,10 +67,14 @@ public class MandelbrotParameters {
 			y2 = yn1;
 		}
 		
-		scale = (int)(scale*(before/(x2-x1)));
-		step = step/(before/(x2-x1));
+		if ((x2-x1)/(y2-y1)>ratioWidthToHeight) {
+			scale = scale*(beforeX/(x2-x1));
+		} else {
+			scale = scale*(beforeY/(y2-y1));
+		}
 		
-		init();
+		step = step/(beforeX/(x2-x1));
+		init(0);
 	}
 	
 	public String toString() {
