@@ -3,6 +3,8 @@ package mandelbrot;
 import java.util.Date;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
@@ -13,7 +15,7 @@ import org.eclipse.swt.widgets.Shell;
 public class Mandelbrot {
 	private int height;
 	private int width;
-	private int scale;
+	private int scale = 400;
 	private int iterations;
 	
 	private double x1= -2;
@@ -21,8 +23,7 @@ public class Mandelbrot {
 	private double y1 = -1.2;
 	private double y2 = 1.2;
 	
-	private double step;
-	private int[][] points;
+	private double step = 0.002;
 	
 	private static Mandelbrot instance;
 	
@@ -32,17 +33,14 @@ public class Mandelbrot {
 	}
 	
 	public void init() {
-		height = Display.getCurrent().getClientArea().height-50;
-		width = Double.valueOf((x2-x1)*height/(y2-y1)).intValue();
-		scale = Double.valueOf(height/(x2-x1)).intValue();
+		height = (int)((y2-y1)*scale);
+		width = (int)((x2-x1)*scale);
 		iterations = 200;
-		step = 0.002;
-		points = new int[width][height];
 	}
 	
 	public String toString() {
-		return String.format("height: %s; width; %s; scale: %s; iterations: %s; step: %s;\n", height, width, scale, iterations, step)+
-				String.format(" x1: %s; x2: %s;\n y1: %s; y2: %s;", x1, x2, y1, y2);
+		return String.format("height: %s; width; %s; scale: %s; iterations: %s; step: %e;\n", height, width, scale, iterations, step)+
+				String.format(" x1: %e; x2: %e;\n y1: %e; y2: %e;", x1, x2, y1, y2);
 	}
 
 	public static void main(String[] args) {
@@ -55,16 +53,63 @@ public class Mandelbrot {
 		
 		init();
 		
-		Shell shell = new Shell(display, SWT.CLOSE | SWT.BORDER);
-		shell.setText("Mandelbrot ------ "+this);
+		Shell shell = new Shell(display, SWT.CLOSE);
 		shell.setBounds(0, 0, width, height);
 		
         shell.addPaintListener(new PaintListener() {
 			@Override
 			public void paintControl(PaintEvent e) {
+				shell.setText("Mandelbrot ------ "+Mandelbrot.this+" ---- Calculating");
 				mandelbrot(e.gc);
+				shell.setText(shell.getText()+" ---- Done");
 			}
 		});
+        
+        shell.addMouseListener(new MouseListener() {
+        	private double xn1;
+        	private double yn1;
+        	private double xn2;
+        	private double yn2;
+        	
+			public void mouseDoubleClick(MouseEvent e) {}
+
+			@Override
+			public void mouseDown(MouseEvent e) {
+				xn1 = Double.valueOf(e.x)/scale;
+				yn1 = Double.valueOf(e.y)/scale;
+			}
+
+			@Override
+			public void mouseUp(MouseEvent e) {
+				xn2 = Double.valueOf(e.x)/scale;
+				yn2 = Double.valueOf(e.y)/scale;
+				double before = x2-x1;
+				
+				if (xn1<xn2) {
+					x1 = xn1;
+					x2 = xn2;
+				} else {
+					x1 = xn2;
+					x2 = xn1;
+				}
+				
+				if (yn1<yn2) {
+					y1 = yn1;
+					y2 = yn2;
+				} else {
+					y1 = yn2;
+					y2 = yn1;
+				}
+				
+				scale = (int)(scale*(before/(x2-x1)));
+				init();
+				
+				step = step/(before/(x2-x1));
+				
+				shell.redraw();
+			}
+        });
+        
 		shell.open();
 		
 		while (!shell.isDisposed()) {
@@ -79,13 +124,12 @@ public class Mandelbrot {
 		double x = x1;
 		double y = y1;
 		
-		int halfWidth = 2*width/3;//-(int)(scale*x1);
-		int halfHeight = height/2;//-(int)(scale*y1);
 		while (true) {
-			int pointx = (int)(x*scale)+halfWidth;
-			int pointy = (int)(y*scale)+halfHeight;
+			int scaledx = (int)(x*scale-x1*scale);
+			int scaledy = (int)(y*scale-y1*scale);
 			
-			points[pointx][pointy] = getPrecision(x, y);
+			setForeground(gc, getPrecision(x, y));
+			gc.drawPoint(scaledx, scaledy);
 			
 			x+=step;
 			if (x>=x2 && y>=y2) break;
@@ -96,20 +140,8 @@ public class Mandelbrot {
 			}
 		}
 		
-		System.out.println("Calculating took: "+getTimeElapsed(new Date().getTime()-date.getTime()));
-		date = new Date();
-		drawPoints(gc);
-		System.out.println("Rendering took: "+getTimeElapsed(new Date().getTime()-date.getTime()));
+		System.out.println("Calculating took: "+MandelbrotUtils.getTimeElapsed(new Date().getTime()-date.getTime()));
 		System.out.println(this);
-	}
-	
-	private void drawPoints(GC gc) {
-		for (int i=0;i<width;i++) {
-			for (int j=0;j<height;j++) {
-				setForeground(gc, points[i][j]);
-				gc.drawPoint(i, j);
-			}
-		}
 	}
 	
 	private int getPrecision(double x, double y) {
@@ -117,7 +149,7 @@ public class Mandelbrot {
 		double yn = y;
 		int i=0;
 		for (;i<iterations;i++) {
-			if (module(xn, yn)>4) break;//definitely not in set
+			if (MandelbrotUtils.module(xn, yn)>4) break;//definitely not in set
 			
 			double xn1 = xn*xn-yn*yn+x;
 			yn = 2*xn*yn+y;
@@ -125,7 +157,7 @@ public class Mandelbrot {
 			xn = xn1;
 		}
 		
-		return module(xn, yn)<4?0:i;//in set/not in set
+		return MandelbrotUtils.module(xn, yn)<4?0:i;//in set/not in set
 	}
 	
 	private void setForeground(GC gc, int value) {
@@ -138,46 +170,5 @@ public class Mandelbrot {
 		if (gc.getForeground() != color) {
 			gc.setForeground(color);
 		}
-	}
-	
-	private double module(double x, double y) {
-		return x*x+y*y;
-	}
-	
-	private String getTimeElapsed(long elapsed) {
-        long milliseconds = elapsed % 1000;
-        elapsed = elapsed / 1000;
-        long seconds = elapsed % 60;
-        elapsed = elapsed / 60;
-        long minutes = elapsed % 60;
-        elapsed = elapsed / 60;
-        long hours = elapsed % 24;
-        elapsed = elapsed / 24;
-        long days = elapsed % 7;
-        elapsed = elapsed / 7;
-        long weeks = elapsed % 4;
-        elapsed = elapsed / 4;
-        long months = elapsed % 12;
-        long years = elapsed / 12;
-        
-        String millisStr = (milliseconds != 0? (milliseconds + " ms") : "");
-		String secondsStr = (seconds != 0 ? (seconds + " s ") : "");
-		String minutesStr = (minutes != 0 ? (minutes + " m ") : "");
-		String hoursStr = (hours != 0 ? (hours + " h ") : "");
-		String daysStr = (days != 0 ? (days + " d ") : "");
-		String weeksStr = (weeks != 0 ? (weeks + " w ") : "");
-		String monthsStr = (months != 0 ? (months + " M ") : "");
-		String yearsStr = (years != 0 ? (years + " y ") : "");
-		
-		String result = new StringBuilder(yearsStr)
-			.append(monthsStr)
-			.append(weeksStr)
-			.append(daysStr)
-			.append(hoursStr)
-			.append(minutesStr)
-			.append(secondsStr)
-			.append(millisStr).toString();
-		
-		return result.isEmpty()?"0 ms":result;
 	}
 }
