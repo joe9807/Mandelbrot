@@ -5,6 +5,8 @@ import java.util.Date;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
@@ -12,6 +14,8 @@ import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 
 public class Mandelbrot {
@@ -46,12 +50,16 @@ public class Mandelbrot {
 
 			@Override
 			public void mouseDown(MouseEvent e) {
+				if (e.button != 1) return;
+				
 				xn1 = parameters.getUnScaledX(e.x);
 				yn1 = parameters.getUnScaledY(e.y);
 			}
 
 			@Override
 			public void mouseUp(MouseEvent e) {
+				if (e.button != 1) return;
+				
 				xn2 = parameters.getUnScaledX(e.x);
 				yn2 = parameters.getUnScaledY(e.y);
 				
@@ -65,6 +73,7 @@ public class Mandelbrot {
         });
         
         
+        setMenu(shell);
         shell.open();
         
         drawImage(shell);
@@ -74,6 +83,34 @@ public class Mandelbrot {
 				shell.getDisplay().sleep();
 			}	
 		}
+	}
+	
+	private void setMenu(Shell shell) {
+		Menu popupMenu = new Menu(shell);
+	    MenuItem resetItems = new MenuItem(popupMenu, SWT.NONE);
+	    resetItems.setText("Reset");
+	    resetItems.addSelectionListener(new SelectionListener() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				parameters = new MandelbrotParameters(0, shell.getDisplay().getPrimaryMonitor().getClientArea().height-20);
+				shell.setBounds(0, 0, parameters.getWidth(), parameters.getHeight());
+				drawImage(shell);
+			}
+
+			public void widgetDefaultSelected(SelectionEvent e) {}
+	    });
+	    
+	    MenuItem refreshItem = new MenuItem(popupMenu, SWT.NONE);
+	    refreshItem.setText("Redraw");
+	    refreshItem.addSelectionListener(new SelectionListener() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				drawImage(shell);
+			}
+
+			public void widgetDefaultSelected(SelectionEvent e) {}
+	    });
+	    shell.setMenu(popupMenu);
 	}
 	
 	private void drawImage(Shell shell) {

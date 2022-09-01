@@ -11,12 +11,18 @@ public class MandelbrotParameters {
 	private double step;
 	private double scale;
 	
-	private double x1= -2;
-	private double x2 = 1;
-	private double y1 = -1.2;
-	private double y2 = 1.2;
+	private double x1;
+	private double x2;
+	private double y1;
+	private double y2;
 	
 	public MandelbrotParameters(int screenWidth, int screenHeight) {
+		x1= -2;
+		x2 = 1;
+		y1 = -1.2;
+		y2 = 1.2;
+		step = 0;
+		
 		init(screenWidth, screenHeight);
 	}
 	
