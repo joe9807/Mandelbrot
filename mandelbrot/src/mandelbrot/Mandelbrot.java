@@ -33,7 +33,7 @@ public class Mandelbrot {
 	
 	private void run () {
 		Shell shell = new Shell(new Display(), SWT.CLOSE);
-		parameters = new MandelbrotParameters(shell.getDisplay().getPrimaryMonitor().getClientArea().height-20);
+		parameters = new MandelbrotParameters(0, shell.getDisplay().getPrimaryMonitor().getClientArea().height-20);
 		shell.setBounds(0, 0, parameters.getWidth(), parameters.getHeight());
 		shell.setLayout(new FillLayout());
         shell.addMouseListener(new MouseListener() {
@@ -56,7 +56,7 @@ public class Mandelbrot {
 				yn2 = parameters.getUnScaledY(e.y);
 				
 				final Rectangle rect = shell.getDisplay().getPrimaryMonitor().getClientArea();
-				parameters.change(xn1, yn1, xn2, yn2, Double.valueOf(rect.width)/rect.height);
+				parameters.change(xn1, yn1, xn2, yn2, rect.width, rect.height-20);
 				
 				shell.setBounds(0, 0, parameters.getWidth(), parameters.getHeight());
 				

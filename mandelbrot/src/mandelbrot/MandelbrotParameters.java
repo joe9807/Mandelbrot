@@ -14,21 +14,29 @@ public class MandelbrotParameters {
 	private double y1 = -1.2;
 	private double y2 = 1.2;
 	
-	private double step = 0.002;
+	private double step;
 	
-	public MandelbrotParameters(int initialHeight) {
-		init(initialHeight);
+	public MandelbrotParameters(int screenWidth, int screenHeight) {
+		init(screenWidth, screenHeight);
 	}
 	
-	public void init(int initialHeight) {
-		if (initialHeight != 0) {
-			scale = initialHeight/(y2-y1);
-			height = initialHeight;
+	public void init(int screenWidth, int screenHeight) {
+		double scalePrev = scale;
+		if (screenHeight != 0) {
+			scale = screenHeight/height();
+			height = screenHeight;
+			width = (int)(width()*scale);
 		} else {
-			height = (int)((y2-y1)*scale);
+			scale = screenWidth/width();
+			width = screenWidth;
+			height = (int)(height()*scale);
 		}
 		
-		width = (int)((x2-x1)*scale);
+		if (step == 0) {
+			step = 0.002;
+		} else {
+			step = scalePrev*step/scale;
+		}
 	}
 	
 	public int getScaledX(double x) {
@@ -47,10 +55,7 @@ public class MandelbrotParameters {
 		return (y/scale)+y1;
 	}
 	
-	public void change(double xn1, double yn1, double xn2, double yn2, double ratioWidthToHeight) {
-		double beforeX = x2-x1;
-		double beforeY = y2-y1;
-		
+	public void change(double xn1, double yn1, double xn2, double yn2, int screenWidth, int screenHeight) {
 		if (xn1<xn2) {
 			x1 = xn1;
 			x2 = xn2;
@@ -67,14 +72,19 @@ public class MandelbrotParameters {
 			y2 = yn1;
 		}
 		
-		if ((x2-x1)/(y2-y1)>ratioWidthToHeight) {
-			scale = scale*(beforeX/(x2-x1));
+		if (width()/height()>(Double.valueOf(screenWidth)/screenHeight)) {
+			init(screenWidth, 0);
 		} else {
-			scale = scale*(beforeY/(y2-y1));
+			init(0, screenHeight);
 		}
-		
-		step = step/(beforeX/(x2-x1));
-		init(0);
+	}
+	
+	private double width() {
+		return x2-x1;
+	}
+	
+	private double height() {
+		return y2-y1;
 	}
 	
 	public String toString() {
