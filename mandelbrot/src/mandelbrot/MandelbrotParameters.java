@@ -16,6 +16,10 @@ public class MandelbrotParameters {
 	
 	private double step = 0.002;
 	
+	public MandelbrotParameters() {
+		init();
+	}
+	
 	public void init() {
 		height = (int)((y2-y1)*scale);
 		width = (int)((x2-x1)*scale);

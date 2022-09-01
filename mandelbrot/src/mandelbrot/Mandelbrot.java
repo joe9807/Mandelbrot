@@ -31,14 +31,9 @@ public class Mandelbrot {
 	}
 	
 	private void run () {
-		Display display = new Display();
-		
-		parameters.init();
-		
-		Shell shell = new Shell(display, SWT.CLOSE);
+		Shell shell = new Shell(new Display(), SWT.CLOSE);
 		shell.setBounds(0, 0, parameters.getWidth(), parameters.getHeight());
 		shell.setLayout(new FillLayout());
-        
         shell.addMouseListener(new MouseListener() {
         	private double xn1;
         	private double yn1;
@@ -66,22 +61,17 @@ public class Mandelbrot {
         
         shell.open();
         
-        shell.setText("Mandelbrot ------ "+Mandelbrot.this+" ---- Calculating");
 		ImageData imageData = new ImageData(parameters.getWidth(), parameters.getHeight(), 24, new PaletteData(0xFF , 0xFF00 , 0xFF0000));
 		mandelbrot(imageData);
-		Image image = new Image(display, imageData);
-		GC gc = new GC(shell);
-		gc.drawImage(image, 0, 0);
-
-		shell.setText(shell.getText()+" ---- Done");
+		new GC(shell).drawImage(new Image(shell.getDisplay(), imageData), 0, 0);
         
 		while (!shell.isDisposed()) {
-			if (!display.readAndDispatch()) {
-				display.sleep();
+			if (!shell.getDisplay().readAndDispatch()) {
+				shell.getDisplay().sleep();
 			}	
 		}
 		
-		display.dispose();
+		shell.getDisplay().dispose();
 	}
 	
 	private void mandelbrot(ImageData imageData) {
