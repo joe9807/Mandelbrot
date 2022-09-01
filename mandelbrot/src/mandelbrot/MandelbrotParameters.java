@@ -6,7 +6,7 @@ import lombok.Data;
 public class MandelbrotParameters {
 	private int height;
 	private int width;
-	private long maxIterations = 200;
+	private long maxIterations = 400;
 
 	private double step;
 	private double scale;

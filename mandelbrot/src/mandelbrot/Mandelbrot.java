@@ -87,12 +87,13 @@ public class Mandelbrot {
 		double x = parameters.getX1();
 		double y = parameters.getY1();
 		
+		int[][] points = new int[imageData.width][imageData.height];
 		while (true) {
 			int scaledX = parameters.getScaledX(x);
 			int scaledY = parameters.getScaledY(y);
 			
 			if (scaledX<imageData.width && scaledY<imageData.height) {
-				imageData.setPixel(scaledX, scaledY, MandelbrotUtils.getColor(getIterations(x, y), parameters.getMaxIterations()));
+				points[scaledX][scaledY] = MandelbrotUtils.getColor(getIterations(x, y), parameters.getMaxIterations());
 			}
 			
 			x+=parameters.getStep();
@@ -104,8 +105,18 @@ public class Mandelbrot {
 			}
 		}
 		
+		setPixels(points, imageData);
+		
 		System.out.println("Calculating took: "+MandelbrotUtils.getTimeElapsed(new Date().getTime()-date.getTime()));
 		System.out.println(this);
+	}
+	
+	private void setPixels(int[][] points, ImageData imageData) {
+		for (int x=0;x<imageData.width;x++) {
+			for (int j=0;j<imageData.height;j++) {
+				imageData.setPixel(x, j, points[x][j]);
+			}
+		}
 	}
 	
 	private long getIterations(double x, double y) {
