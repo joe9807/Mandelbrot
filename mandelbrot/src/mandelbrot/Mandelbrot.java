@@ -21,6 +21,7 @@ import org.eclipse.swt.widgets.Shell;
 public class Mandelbrot {
 	private static Mandelbrot instance;
 	private MandelbrotParameters parameters;
+	private Image image;
 	
 	private static synchronized Mandelbrot getInstance() {
 		if (instance == null) instance = new Mandelbrot();
@@ -105,7 +106,7 @@ public class Mandelbrot {
 	    refreshItem.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				drawImage(shell);
+				new GC(shell).drawImage(image, 0, 0);
 			}
 
 			public void widgetDefaultSelected(SelectionEvent e) {}
@@ -116,7 +117,8 @@ public class Mandelbrot {
 	private void drawImage(Shell shell) {
 		ImageData imageData = new ImageData(parameters.getWidth(), parameters.getHeight(), 24, new PaletteData(0xFF , 0xFF00 , 0xFF0000));
 		mandelbrot(imageData);
-		new GC(shell).drawImage(new Image(shell.getDisplay(), imageData), 0, 0);
+		image = new Image(shell.getDisplay(), imageData);
+		new GC(shell).drawImage(image, 0, 0);
 	}
 	
 	private void mandelbrot(ImageData imageData) {
