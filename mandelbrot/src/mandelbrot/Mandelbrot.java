@@ -98,9 +98,9 @@ public class Mandelbrot {
 			}
 			
 			x+=parameters.getStep();
-			if (x>=parameters.getX2() && y>=parameters.getY2()) break;
-			
 			if (x>=parameters.getX2()) {
+				if (y>=parameters.getY2()) break;
+				
 				x = parameters.getX1();
 				y+=parameters.getStep();
 			}
@@ -113,9 +113,12 @@ public class Mandelbrot {
 	private int getIterations(double x, double y) {
 		double xn = x;
 		double yn = y;
+		double module = 0;
 		int iterations = 0;
+		
 		for (;iterations<parameters.getMaxIterations();iterations++) {
-			if (MandelbrotUtils.module(xn, yn)>4) break;//definitely not in set
+			module = MandelbrotUtils.module(xn, yn);
+			if (module>4) break;//definitely not in set
 			
 			double xn1 = xn*xn-yn*yn+x;
 			yn = 2*xn*yn+y;
@@ -123,6 +126,6 @@ public class Mandelbrot {
 			xn = xn1;
 		}
 		
-		return MandelbrotUtils.module(xn, yn)<4?0:iterations;//in set/not in set
+		return module<4?0:iterations;//in set/not in set
 	}
 }
