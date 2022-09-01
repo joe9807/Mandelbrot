@@ -115,14 +115,24 @@ public class Mandelbrot {
 	}
 	
 	private void drawImage(Shell shell) {
+		shell.setText("Calculating ");
 		ImageData imageData = new ImageData(parameters.getWidth(), parameters.getHeight(), 24, new PaletteData(0xFF , 0xFF00 , 0xFF0000));
-		mandelbrot(imageData);
+		
+		Date date = new Date();
+		int[][] pixels = mandelbrot(imageData);
+		shell.setText(shell.getText()+" ---- "+MandelbrotUtils.getTimeElapsed(new Date().getTime()-date.getTime())+"; ");
+		
+		date = new Date();
+		drawPixels(pixels, imageData);
+		
 		image = new Image(shell.getDisplay(), imageData);
 		new GC(shell).drawImage(image, 0, 0);
+		shell.setText(shell.getText()+" Draw image ---- "+MandelbrotUtils.getTimeElapsed(new Date().getTime()-date.getTime()));
+		
+		System.out.println(this);
 	}
 	
-	private void mandelbrot(ImageData imageData) {
-		Date date = new Date();
+	private int[][] mandelbrot(ImageData imageData) {
 		double x = parameters.getX1();
 		double y = parameters.getY1();
 		
@@ -144,13 +154,10 @@ public class Mandelbrot {
 			}
 		}
 		
-		setPixels(points, imageData);
-		
-		System.out.println("Calculating took: "+MandelbrotUtils.getTimeElapsed(new Date().getTime()-date.getTime()));
-		System.out.println(this);
+		return points;
 	}
 	
-	private void setPixels(int[][] points, ImageData imageData) {
+	private void drawPixels(int[][] points, ImageData imageData) {
 		for (int x=0;x<imageData.width;x++) {
 			for (int j=0;j<imageData.height;j++) {
 				imageData.setPixel(x, j, points[x][j]);
