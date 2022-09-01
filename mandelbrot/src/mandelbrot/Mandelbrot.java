@@ -16,7 +16,6 @@ import org.eclipse.swt.widgets.Shell;
 public class Mandelbrot {
 	private static Mandelbrot instance;
 	private MandelbrotParameters parameters = new MandelbrotParameters();
-	private Image image;
 	
 	private static synchronized Mandelbrot getInstance() {
 		if (instance == null) instance = new Mandelbrot();
@@ -35,7 +34,6 @@ public class Mandelbrot {
 		Shell shell = new Shell(new Display(), SWT.CLOSE);
 		shell.setBounds(0, 0, parameters.getWidth(), parameters.getHeight());
 		shell.setLayout(new FillLayout());
-		shell.setRedraw(true);
         shell.addMouseListener(new MouseListener() {
         	private double xn1;
         	private double yn1;
@@ -59,26 +57,26 @@ public class Mandelbrot {
 				
 				shell.setBounds(0, 0, parameters.getWidth(), parameters.getHeight());
 				
-				image.dispose();
-				ImageData imageData = new ImageData(parameters.getWidth(), parameters.getHeight(), 24, new PaletteData(0xFF , 0xFF00 , 0xFF0000));
-				mandelbrot(imageData);
-				image = new Image(shell.getDisplay(), imageData);
-				new GC(shell).drawImage(image, 0, 0);
+				drawImage(shell);
 			}
         });
         
+        
         shell.open();
         
-		ImageData imageData = new ImageData(parameters.getWidth(), parameters.getHeight(), 24, new PaletteData(0xFF , 0xFF00 , 0xFF0000));
-		mandelbrot(imageData);
-		image = new Image(shell.getDisplay(), imageData);
-		new GC(shell).drawImage(image, 0, 0);
-		
+        drawImage(shell);
+
 		while (!shell.isDisposed()) {
 			if (!shell.getDisplay().readAndDispatch()) {
 				shell.getDisplay().sleep();
 			}	
 		}
+	}
+	
+	private void drawImage(Shell shell) {
+		ImageData imageData = new ImageData(parameters.getWidth(), parameters.getHeight(), 24, new PaletteData(0xFF , 0xFF00 , 0xFF0000));
+		mandelbrot(imageData);
+		new GC(shell).drawImage(new Image(shell.getDisplay(), imageData), 0, 0);
 	}
 	
 	private void mandelbrot(ImageData imageData) {
