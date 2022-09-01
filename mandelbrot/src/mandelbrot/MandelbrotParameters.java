@@ -95,6 +95,6 @@ public class MandelbrotParameters {
 	
 	public String toString() {
 		return String.format("height: %s; width; %s; scale: %s; iterations: %s; step: %e;\n", height, width, scale, maxIterations, step)+
-				String.format(" x1: %e; x2: %e;\n y1: %e; y2: %e;", x1, x2, y1, y2);
+				String.format(" x1: %e; x2: %e;\n y1: %e; y2: %e;\n", x1, x2, y1, y2);
 	}
 }
