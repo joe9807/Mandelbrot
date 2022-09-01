@@ -154,17 +154,19 @@ public class Mandelbrot {
 		
 	}
 	
-	private long getIterations(double x, double y) {
+	private int getIterations(double x, double y) {
 		double xn = x;
 		double yn = y;
 		double module = 0;
-		long iterations = 0;
+		int iterations = 0;
 		
 		for (;iterations<parameters.getMaxIterations();iterations++) {
-			module = MandelbrotUtils.module(xn, yn);
+			double xx = xn*xn;
+			double yy = yn*yn;
+			module = xx+yy;
 			if (module>4) break;//definitely not in set
 			
-			double xn1 = xn*xn-yn*yn+x;
+			double xn1 = xx-yy+x;
 			yn = 2*xn*yn+y;
 			
 			xn = xn1;

@@ -1,18 +1,14 @@
 package mandelbrot;
 
 public class MandelbrotUtils {
-	public static int getColor(long iterations, long maxIterations) {
+	public static int getColor(int iterations, int maxIterations) {
 		int color = 0;
 		if (iterations > 0) {//near to the set
-			int rgb = (int) ((iterations*255)/maxIterations);
+			int rgb = (int) (iterations*255/maxIterations);
 			color = (rgb << 16) | (rgb << 8) | rgb;
 		}
 		
 		return color;
-	}
-	
-	public static double module(double x, double y) {
-		return x*x+y*y;
 	}
 	
 	public static String getTimeElapsed(long elapsed) {
