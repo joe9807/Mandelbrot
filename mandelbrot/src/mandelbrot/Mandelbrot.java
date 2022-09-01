@@ -108,11 +108,11 @@ public class Mandelbrot {
 		System.out.println(this);
 	}
 	
-	private int getIterations(double x, double y) {
+	private long getIterations(double x, double y) {
 		double xn = x;
 		double yn = y;
 		double module = 0;
-		int iterations = 0;
+		long iterations = 0;
 		
 		for (;iterations<parameters.getMaxIterations();iterations++) {
 			module = MandelbrotUtils.module(xn, yn);

@@ -6,15 +6,15 @@ import lombok.Data;
 public class MandelbrotParameters {
 	private int height;
 	private int width;
-	private double scale;
 	private long maxIterations = 200;
+
+	private double step;
+	private double scale;
 	
 	private double x1= -2;
 	private double x2 = 1;
 	private double y1 = -1.2;
 	private double y2 = 1.2;
-	
-	private double step;
 	
 	public MandelbrotParameters(int screenWidth, int screenHeight) {
 		init(screenWidth, screenHeight);
