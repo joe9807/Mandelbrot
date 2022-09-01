@@ -1,6 +1,15 @@
 package mandelbrot;
 
 public class MandelbrotUtils {
+	public static int setForeground(int iterations, int maxIterations) {
+		int color = 0;
+		if (iterations > 0) {//near to the set
+			int rgb = (iterations*255)/maxIterations;
+			color = (rgb << 16) | (rgb << 8) | rgb;
+		}
+		
+		return color;
+	}
 	
 	public static double module(double x, double y) {
 		return x*x+y*y;
