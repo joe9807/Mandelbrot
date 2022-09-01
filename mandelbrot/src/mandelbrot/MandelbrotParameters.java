@@ -33,7 +33,7 @@ public class MandelbrotParameters {
 		}
 		
 		if (step == 0) {
-			step = 0.002;
+			step = 1/scale;
 		} else {
 			step = scalePrev*step/scale;
 		}
