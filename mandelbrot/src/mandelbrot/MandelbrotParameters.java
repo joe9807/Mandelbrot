@@ -6,8 +6,8 @@ import lombok.Data;
 public class MandelbrotParameters {
 	private int height;
 	private int width;
-	private int scale = 400;
-	private int maxIterations = 200;
+	private long scale = 400;
+	private long maxIterations = 200;
 	
 	private double x1= -2;
 	private double x2 = 1;
@@ -34,11 +34,11 @@ public class MandelbrotParameters {
 	}
 	
 	public double getUnScaledX(double x) {
-		return x/scale;
+		return (x/scale)+x1;
 	}
 	
 	public double getUnScaledY(double y) {
-		return y/scale;
+		return (y/scale)+y1;
 	}
 	
 	public void change(double xn1, double yn1, double xn2, double yn2) {
