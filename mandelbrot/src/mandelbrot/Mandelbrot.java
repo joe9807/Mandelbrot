@@ -1,6 +1,7 @@
 package mandelbrot;
 
 import java.util.Date;
+import java.util.stream.IntStream;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
@@ -21,7 +22,10 @@ import org.eclipse.swt.widgets.Shell;
 public class Mandelbrot {
 	private static Mandelbrot instance;
 	private MandelbrotParameters parameters;
+	private GC gc;
 	private Image image;
+	private MandelbrotMode mode = MandelbrotMode.STEPS;
+	private MenuItem menuItemMode;
 	
 	private static synchronized Mandelbrot getInstance() {
 		if (instance == null) instance = new Mandelbrot();
@@ -38,6 +42,7 @@ public class Mandelbrot {
 	
 	private void run () {
 		Shell shell = new Shell(new Display(), SWT.CLOSE);
+		gc = new GC(shell);
 		parameters = new MandelbrotParameters(0, shell.getDisplay().getPrimaryMonitor().getClientArea().height-20);
 		shell.setBounds(0, 0, parameters.getWidth(), parameters.getHeight());
 		shell.setLayout(new FillLayout());
@@ -65,11 +70,10 @@ public class Mandelbrot {
 				yn2 = parameters.getUnScaledY(e.y);
 				
 				final Rectangle rect = shell.getDisplay().getPrimaryMonitor().getClientArea();
-				parameters.change(xn1, yn1, xn2, yn2, rect.width, rect.height-20);
-				
-				shell.setBounds(0, 0, parameters.getWidth(), parameters.getHeight());
-				
-				drawImage(shell);
+				if (parameters.change(xn1, yn1, xn2, yn2, rect.width, rect.height-20)) {
+					shell.setBounds(0, 0, parameters.getWidth(), parameters.getHeight());
+					drawImage(shell);
+				}
 			}
         });
         
@@ -106,7 +110,20 @@ public class Mandelbrot {
 	    refreshItem.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				new GC(shell).drawImage(image, 0, 0);
+				//gc.drawImage(image, 0, 0);
+				drawImage(shell);
+			}
+
+			public void widgetDefaultSelected(SelectionEvent e) {}
+	    });
+	    
+	    menuItemMode = new MenuItem(popupMenu, SWT.NONE);
+	    menuItemMode.setText("Switch to "+mode.anotherMode());
+	    menuItemMode.addSelectionListener(new SelectionListener() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				mode = mode.anotherMode();
+				menuItemMode.setText("Switch to "+mode.anotherMode());
 			}
 
 			public void widgetDefaultSelected(SelectionEvent e) {}
@@ -115,7 +132,7 @@ public class Mandelbrot {
 	}
 	
 	private void drawImage(Shell shell) {
-		shell.setText("Calculating ");
+		shell.setText("Calculating - "+mode);
 		ImageData imageData = new ImageData(parameters.getWidth(), parameters.getHeight(), 24, new PaletteData(0xFF , 0xFF00 , 0xFF0000));
 		
 		Date date = new Date();
@@ -125,13 +142,21 @@ public class Mandelbrot {
 		date = new Date();
 		
 		image = new Image(shell.getDisplay(), imageData);
-		new GC(shell).drawImage(image, 0, 0);
+		gc.drawImage(image, 0, 0);
 		shell.setText(shell.getText()+" Draw image ---- "+MandelbrotUtils.getTimeElapsed(new Date().getTime()-date.getTime()));
 		
 		System.out.println(this);
 	}
 	
 	private void mandelbrot(ImageData imageData) {
+		if (mode.isPixels()) {
+			drawFromPixels(imageData);
+		} else {
+			drawFromStep(imageData);
+		}
+	}
+	
+	private void drawFromStep(ImageData imageData) {
 		double x = parameters.getX1();
 		double y = parameters.getY1();
 		
@@ -150,7 +175,16 @@ public class Mandelbrot {
 				x = parameters.getX1();
 				y+=parameters.getStep();
 			}
-		}	
+		}
+	}
+	
+	private void drawFromPixels(ImageData imageData) {
+		for (int x=0;x<imageData.width;x++) {
+			final int xx = x;
+			IntStream.range(0, imageData.height).parallel().forEach(y->{
+				imageData.setPixel(xx, y, MandelbrotUtils.getColor(getIterations(parameters.getUnScaledX(xx), parameters.getUnScaledY(y)), parameters.getMaxIterations()));
+			});
+		}
 	}
 	
 	private int getIterations(double x, double y) {

@@ -61,7 +61,9 @@ public class MandelbrotParameters {
 		return (y/scale)+y1;
 	}
 	
-	public void change(double xn1, double yn1, double xn2, double yn2, int screenWidth, int screenHeight) {
+	public boolean change(double xn1, double yn1, double xn2, double yn2, int screenWidth, int screenHeight) {
+		if (xn1-xn2 == 0 || yn1 - yn2 == 0) return false;
+		
 		if (xn1<xn2) {
 			x1 = xn1;
 			x2 = xn2;
@@ -83,6 +85,8 @@ public class MandelbrotParameters {
 		} else {
 			init(0, screenHeight);
 		}
+		
+		return true;
 	}
 	
 	private double width() {
