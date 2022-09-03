@@ -22,10 +22,7 @@ import org.eclipse.swt.widgets.Shell;
 public class Mandelbrot {
 	private static Mandelbrot instance;
 	private MandelbrotParameters parameters;
-	private GC gc;
-	private Image image;
 	private MandelbrotMode mode = MandelbrotMode.STEPS;
-	private MenuItem menuItemMode;
 	
 	private static synchronized Mandelbrot getInstance() {
 		if (instance == null) instance = new Mandelbrot();
@@ -42,8 +39,7 @@ public class Mandelbrot {
 	
 	private void run () {
 		Shell shell = new Shell(new Display(), SWT.CLOSE);
-		gc = new GC(shell);
-		parameters = new MandelbrotParameters(0, shell.getDisplay().getPrimaryMonitor().getClientArea().height-20);
+		parameters = new MandelbrotParameters(0, shell.getDisplay().getPrimaryMonitor().getClientArea().height);
 		shell.setBounds(0, 0, parameters.getWidth(), parameters.getHeight());
 		shell.setLayout(new FillLayout());
         shell.addMouseListener(new MouseListener() {
@@ -117,7 +113,7 @@ public class Mandelbrot {
 			public void widgetDefaultSelected(SelectionEvent e) {}
 	    });
 	    
-	    menuItemMode = new MenuItem(popupMenu, SWT.NONE);
+	    MenuItem menuItemMode = new MenuItem(popupMenu, SWT.NONE);
 	    menuItemMode.setText("Switch to "+mode.anotherMode());
 	    menuItemMode.addSelectionListener(new SelectionListener() {
 			@Override
@@ -141,8 +137,8 @@ public class Mandelbrot {
 		
 		date = new Date();
 		
-		image = new Image(shell.getDisplay(), imageData);
-		gc.drawImage(image, 0, 0);
+		Image image = new Image(shell.getDisplay(), imageData);
+		new GC(shell).drawImage(image, 0, 0);
 		shell.setText(shell.getText()+" Draw image ---- "+MandelbrotUtils.getTimeElapsed(new Date().getTime()-date.getTime()));
 		
 		System.out.println(this);
