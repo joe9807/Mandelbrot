@@ -8,13 +8,13 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
@@ -22,7 +22,9 @@ import org.eclipse.swt.widgets.Shell;
 public class Mandelbrot {
 	private static Mandelbrot instance;
 	private MandelbrotParameters parameters;
-	private MandelbrotMode mode = MandelbrotMode.STEPS;
+	private MandelbrotMode mode = MandelbrotMode.PIXELS;
+	private Label label;
+	private Shell shell;
 	
 	private static synchronized Mandelbrot getInstance() {
 		if (instance == null) instance = new Mandelbrot();
@@ -38,11 +40,12 @@ public class Mandelbrot {
 	}
 	
 	private void run () {
-		Shell shell = new Shell(new Display(), SWT.CLOSE);
+		shell = new Shell(new Display(), SWT.CLOSE);
 		parameters = new MandelbrotParameters(0, shell.getDisplay().getPrimaryMonitor().getClientArea().height);
 		shell.setBounds(0, 0, parameters.getWidth(), parameters.getHeight());
 		shell.setLayout(new FillLayout());
-        shell.addMouseListener(new MouseListener() {
+		label = new Label(shell, SWT.NONE);
+        label.addMouseListener(new MouseListener() {
         	private double xn1;
         	private double yn1;
         	private double xn2;
@@ -74,7 +77,7 @@ public class Mandelbrot {
         });
         
         
-        setMenu(shell);
+        setMenu();
         shell.open();
         
         drawImage(shell);
@@ -86,8 +89,8 @@ public class Mandelbrot {
 		}
 	}
 	
-	private void setMenu(Shell shell) {
-		Menu popupMenu = new Menu(shell);
+	private void setMenu() {
+		Menu popupMenu = new Menu(label);
 	    MenuItem resetItems = new MenuItem(popupMenu, SWT.NONE);
 	    resetItems.setText("Reset");
 	    resetItems.addSelectionListener(new SelectionListener() {
@@ -95,18 +98,6 @@ public class Mandelbrot {
 			public void widgetSelected(SelectionEvent e) {
 				parameters = new MandelbrotParameters(0, shell.getDisplay().getPrimaryMonitor().getClientArea().height-20);
 				shell.setBounds(0, 0, parameters.getWidth(), parameters.getHeight());
-				drawImage(shell);
-			}
-
-			public void widgetDefaultSelected(SelectionEvent e) {}
-	    });
-	    
-	    MenuItem refreshItem = new MenuItem(popupMenu, SWT.NONE);
-	    refreshItem.setText("Redraw");
-	    refreshItem.addSelectionListener(new SelectionListener() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				//gc.drawImage(image, 0, 0);
 				drawImage(shell);
 			}
 
@@ -124,7 +115,7 @@ public class Mandelbrot {
 
 			public void widgetDefaultSelected(SelectionEvent e) {}
 	    });
-	    shell.setMenu(popupMenu);
+	    label.setMenu(popupMenu);
 	}
 	
 	private void drawImage(Shell shell) {
@@ -138,7 +129,7 @@ public class Mandelbrot {
 		date = new Date();
 		
 		Image image = new Image(shell.getDisplay(), imageData);
-		new GC(shell).drawImage(image, 0, 0);
+		label.setImage(image);
 		shell.setText(shell.getText()+" Draw image ---- "+MandelbrotUtils.getTimeElapsed(new Date().getTime()-date.getTime()));
 		
 		System.out.println(this);
