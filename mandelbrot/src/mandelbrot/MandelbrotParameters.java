@@ -1,5 +1,7 @@
 package mandelbrot;
 
+import org.eclipse.swt.graphics.Rectangle;
+
 import lombok.Data;
 
 @Data
@@ -61,7 +63,7 @@ public class MandelbrotParameters {
 		return (y/scale)+y1;
 	}
 	
-	public boolean change(double xn1, double yn1, double xn2, double yn2, int screenWidth, int screenHeight) {
+	public boolean change(double xn1, double yn1, double xn2, double yn2, Rectangle rect) {
 		if (xn1-xn2 == 0 || yn1 - yn2 == 0) return false;
 		
 		if (xn1<xn2) {
@@ -80,10 +82,10 @@ public class MandelbrotParameters {
 			y2 = yn1;
 		}
 		
-		if (width()/height()>(Double.valueOf(screenWidth)/screenHeight)) {
-			init(screenWidth, 0);
+		if (width()/height()>(Double.valueOf(rect.width)/rect.height)) {
+			init(rect.width, 0);
 		} else {
-			init(0, screenHeight);
+			init(0, rect.height);
 		}
 		
 		return true;
@@ -100,5 +102,12 @@ public class MandelbrotParameters {
 	public String toString() {
 		return String.format("height: %s; width; %s; scale: %s; iterations: %s; step: %e;\n", height, width, scale, maxIterations, step)+
 				String.format(" x1: %e; x2: %e;\n y1: %e; y2: %e;\n", x1, x2, y1, y2);
+	}
+	
+	public void reduce(Rectangle rect) {
+		double step = 0.02;
+		x1+=step; x2-=step;
+		y1+=step; y2-=step;
+		init(0, rect.height);
 	}
 }

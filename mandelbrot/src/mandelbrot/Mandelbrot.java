@@ -1,6 +1,7 @@
 package mandelbrot;
 
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.IntStream;
 
 import org.eclipse.swt.SWT;
@@ -25,6 +26,8 @@ public class Mandelbrot {
 	private MandelbrotMode mode = MandelbrotMode.PIXELS;
 	private Label label;
 	private Shell shell;
+	private List<Image> images = new ArrayList<Image>();
+	private int imagesSize = 40;
 	
 	private static synchronized Mandelbrot getInstance() {
 		if (instance == null) instance = new Mandelbrot();
@@ -69,9 +72,9 @@ public class Mandelbrot {
 				yn2 = parameters.getUnScaledY(e.y);
 				
 				final Rectangle rect = shell.getDisplay().getPrimaryMonitor().getClientArea();
-				if (parameters.change(xn1, yn1, xn2, yn2, rect.width, rect.height-20)) {
+				if (parameters.change(xn1, yn1, xn2, yn2, rect)) {
 					shell.setBounds(0, 0, parameters.getWidth(), parameters.getHeight());
-					drawImage(shell);
+					createAndDrawImage(true);
 				}
 			}
         });
@@ -80,7 +83,7 @@ public class Mandelbrot {
         setMenu();
         shell.open();
         
-        drawImage(shell);
+        createAndDrawImage(true);
 
 		while (!shell.isDisposed()) {
 			if (!shell.getDisplay().readAndDispatch()) {
@@ -96,9 +99,9 @@ public class Mandelbrot {
 	    resetItems.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				parameters = new MandelbrotParameters(0, shell.getDisplay().getPrimaryMonitor().getClientArea().height-20);
+				parameters = new MandelbrotParameters(0, shell.getDisplay().getPrimaryMonitor().getClientArea().height);
 				shell.setBounds(0, 0, parameters.getWidth(), parameters.getHeight());
-				drawImage(shell);
+				createAndDrawImage(true);
 			}
 
 			public void widgetDefaultSelected(SelectionEvent e) {}
@@ -115,24 +118,79 @@ public class Mandelbrot {
 
 			public void widgetDefaultSelected(SelectionEvent e) {}
 	    });
+	    
+	    MenuItem menuItemSet = new MenuItem(popupMenu, SWT.NONE);
+	    menuItemSet.setText("Create Set");
+	    menuItemSet.addSelectionListener(new SelectionListener() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if (images.size() == 0) {
+					createSet(menuItemSet);
+				} else {
+					playSet(menuItemSet);
+				}
+			}
+
+			public void widgetDefaultSelected(SelectionEvent e) {}
+	    });
 	    label.setMenu(popupMenu);
 	}
 	
-	private void drawImage(Shell shell) {
-		shell.setText("Calculating - "+mode);
+	private void createSet(MenuItem menuItemSet) {
+		menuItemSet.setEnabled(false);
+		
+		for (int i=0;i<imagesSize;i++) {
+			final int ii = i;
+			Display.getDefault().asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					parameters.reduce(shell.getDisplay().getPrimaryMonitor().getClientArea());
+					shell.setText(ii+"");
+					images.add(createAndDrawImage(false));
+					
+					if (images.size() == imagesSize) {
+						menuItemSet.setText("Play Set");
+						menuItemSet.setEnabled(true);
+					}
+				}
+			});
+		}
+	}
+	
+	private void playSet(MenuItem menuItemSet) {
+		menuItemSet.setEnabled(false);
+		
+		images.stream().forEach(image->{
+			Display.getDefault().asyncExec(new Runnable() {
+				public void run() {
+					label.setImage(image);
+					
+					try {
+						Thread.sleep(100);
+					} catch (InterruptedException e) {}
+					
+					images.remove(image);
+					if (images.size() == 0) {
+						menuItemSet.setText("Create Set");
+						menuItemSet.setEnabled(true);
+					}
+					
+					shell.setText(images.size()+"");
+				}
+			});
+		});
+	}
+	
+	private Image createAndDrawImage(boolean draw) {
 		ImageData imageData = new ImageData(parameters.getWidth(), parameters.getHeight(), 24, new PaletteData(0xFF , 0xFF00 , 0xFF0000));
 		
-		Date date = new Date();
 		mandelbrot(imageData);
-		shell.setText(shell.getText()+" ---- "+MandelbrotUtils.getTimeElapsed(new Date().getTime()-date.getTime())+"; ");
 		
-		date = new Date();
-		
-		Image image = new Image(shell.getDisplay(), imageData);
-		label.setImage(image);
-		shell.setText(shell.getText()+" Draw image ---- "+MandelbrotUtils.getTimeElapsed(new Date().getTime()-date.getTime()));
-		
-		System.out.println(this);
+		Image image = new Image(label.getDisplay(), imageData);
+		if (draw) {
+			label.setImage(image);
+		}
+		return image;
 	}
 	
 	private void mandelbrot(ImageData imageData) {
