@@ -23,6 +23,7 @@ import org.eclipse.swt.widgets.Shell;
 public class Mandelbrot {
 	private static Mandelbrot instance;
 	private MandelbrotParameters parameters;
+	private MandelbrotTitle title;
 	private MandelbrotMode mode = MandelbrotMode.PIXELS;
 	private Label label;
 	private Shell shell;
@@ -44,6 +45,7 @@ public class Mandelbrot {
 	
 	private void run () {
 		shell = new Shell(new Display(), SWT.CLOSE);
+		title = new MandelbrotTitle(shell, imagesSize);
 		parameters = new MandelbrotParameters(0, shell.getDisplay().getPrimaryMonitor().getClientArea().height);
 		shell.setBounds(0, 0, parameters.getWidth(), parameters.getHeight());
 		shell.setLayout(new FillLayout());
@@ -120,15 +122,11 @@ public class Mandelbrot {
 	    });
 	    
 	    MenuItem menuItemSet = new MenuItem(popupMenu, SWT.NONE);
-	    menuItemSet.setText("Create Set");
+	    menuItemSet.setText("Create/Play Set");
 	    menuItemSet.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				if (images.size() == 0) {
-					createSet(menuItemSet);
-				} else {
-					playSet(menuItemSet);
-				}
+				createAndPlaySet(menuItemSet);
 			}
 
 			public void widgetDefaultSelected(SelectionEvent e) {}
@@ -136,7 +134,7 @@ public class Mandelbrot {
 	    label.setMenu(popupMenu);
 	}
 	
-	private void createSet(MenuItem menuItemSet) {
+	private void createAndPlaySet(MenuItem menuItemSet) {
 		menuItemSet.setEnabled(false);
 		
 		for (int i=0;i<imagesSize;i++) {
@@ -145,7 +143,7 @@ public class Mandelbrot {
 				public void run() {
 					parameters.reduce(shell.getDisplay().getPrimaryMonitor().getClientArea());
 					images.add(createAndDrawImage(false));
-					shell.setText(images.size()+"");
+					title.countImages(imagesSize-images.size());
 					
 					if (images.size() == imagesSize) {
 						playSet(menuItemSet);
@@ -170,7 +168,7 @@ public class Mandelbrot {
 						menuItemSet.setEnabled(true);
 					}
 					
-					shell.setText(images.size()+"");
+					title.countImages(images.size());
 				}
 			});
 		});
