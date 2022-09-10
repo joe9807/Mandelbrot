@@ -18,14 +18,14 @@ public class MandelbrotParameters {
 	private double y1;
 	private double y2;
 	
-	public MandelbrotParameters(int screenWidth, int screenHeight) {
+	public MandelbrotParameters(Rectangle screenResolution) {
 		x1= -2;
 		x2 = 1;
 		y1 = -1.2;
 		y2 = 1.2;
 		step = 0;
 		
-		init(screenWidth, screenHeight);
+		init(screenResolution.width, screenResolution.height);
 	}
 	
 	public void init(int screenWidth, int screenHeight) {
@@ -63,7 +63,7 @@ public class MandelbrotParameters {
 		return (y/scale)+y1;
 	}
 	
-	public boolean change(double xn1, double yn1, double xn2, double yn2, Rectangle rect) {
+	public boolean change(double xn1, double yn1, double xn2, double yn2, Rectangle screenResolution) {
 		if (xn1-xn2 == 0 || yn1 - yn2 == 0) return false;
 		
 		if (xn1<xn2) {
@@ -82,10 +82,10 @@ public class MandelbrotParameters {
 			y2 = yn1;
 		}
 		
-		if (width()/height()>(Double.valueOf(rect.width)/rect.height)) {
-			init(rect.width, 0);
+		if (rectRatio()>(Double.valueOf(screenResolution.width)/screenResolution.height)) {
+			init(screenResolution.width, 0);
 		} else {
-			init(0, rect.height);
+			init(0, screenResolution.height);
 		}
 		
 		return true;
@@ -99,15 +99,21 @@ public class MandelbrotParameters {
 		return y2-y1;
 	}
 	
+	private double rectRatio() {
+		return width()/height();
+	}
+	
 	public String toString() {
 		return String.format("height: %s; width; %s; scale: %s; iterations: %s; step: %e;\n", height, width, scale, maxIterations, step)+
 				String.format(" x1: %e; x2: %e;\n y1: %e; y2: %e;\n", x1, x2, y1, y2);
 	}
 	
 	public void reduce(Rectangle rect) {
-		double step = 0.02;
-		x1+=step; x2-=step;
-		y1+=step; y2-=step;
+		double stepx = 0.02;
+		double stepy = stepx/(rectRatio());
+		x1+=stepx; x2-=stepx;
+		
+		y1+=stepy; y2-=stepy;
 		init(0, rect.height);
 	}
 }

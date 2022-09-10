@@ -46,10 +46,10 @@ public class Mandelbrot {
 	private void run () {
 		shell = new Shell(new Display(), SWT.CLOSE);
 		title = new MandelbrotTitle(shell, imagesSize);
-		parameters = new MandelbrotParameters(0, shell.getDisplay().getPrimaryMonitor().getClientArea().height);
+		parameters = new MandelbrotParameters(shell.getDisplay().getPrimaryMonitor().getClientArea());
 		shell.setBounds(0, 0, parameters.getWidth(), parameters.getHeight());
 		shell.setLayout(new FillLayout());
-		label = new Label(shell, SWT.NONE);
+		label = new Label(shell, SWT.BORDER);
         label.addMouseListener(new MouseListener() {
         	private double xn1;
         	private double yn1;
@@ -85,8 +85,6 @@ public class Mandelbrot {
         setMenu();
         shell.open();
         
-        createAndDrawImage(true);
-
 		while (!shell.isDisposed()) {
 			if (!shell.getDisplay().readAndDispatch()) {
 				shell.getDisplay().sleep();
@@ -101,7 +99,7 @@ public class Mandelbrot {
 	    resetItems.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				parameters = new MandelbrotParameters(0, shell.getDisplay().getPrimaryMonitor().getClientArea().height);
+				parameters = new MandelbrotParameters(shell.getDisplay().getPrimaryMonitor().getClientArea());
 				shell.setBounds(0, 0, parameters.getWidth(), parameters.getHeight());
 				createAndDrawImage(true);
 			}
@@ -234,8 +232,7 @@ public class Mandelbrot {
 		for (;iterations<parameters.getMaxIterations();iterations++) {
 			double xx = xn*xn;
 			double yy = yn*yn;
-			module = xx+yy;
-			if (module>4) return iterations;//definitely not in set
+			if ((module=xx+yy)>4) return iterations;//definitely not in set
 			
 			double xn1 = xx-yy+x;
 			yn = 2*xn*yn+y;
