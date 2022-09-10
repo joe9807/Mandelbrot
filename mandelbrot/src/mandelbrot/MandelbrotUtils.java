@@ -47,4 +47,10 @@ public class MandelbrotUtils {
 		
 		return result.isEmpty()?"0 ms":result;
 	}
+	
+	public static void sleep() {
+		try {
+			Thread.sleep(100);
+		} catch (InterruptedException e) {}
+	}
 }

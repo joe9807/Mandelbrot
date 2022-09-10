@@ -140,17 +140,15 @@ public class Mandelbrot {
 		menuItemSet.setEnabled(false);
 		
 		for (int i=0;i<imagesSize;i++) {
-			final int ii = i;
 			Display.getDefault().asyncExec(new Runnable() {
 				@Override
 				public void run() {
 					parameters.reduce(shell.getDisplay().getPrimaryMonitor().getClientArea());
-					shell.setText(ii+"");
 					images.add(createAndDrawImage(false));
+					shell.setText(images.size()+"");
 					
 					if (images.size() == imagesSize) {
-						menuItemSet.setText("Play Set");
-						menuItemSet.setEnabled(true);
+						playSet(menuItemSet);
 					}
 				}
 			});
@@ -158,20 +156,17 @@ public class Mandelbrot {
 	}
 	
 	private void playSet(MenuItem menuItemSet) {
-		menuItemSet.setEnabled(false);
+		MandelbrotUtils.sleep();
 		
 		images.stream().forEach(image->{
 			Display.getDefault().asyncExec(new Runnable() {
 				public void run() {
 					label.setImage(image);
 					
-					try {
-						Thread.sleep(100);
-					} catch (InterruptedException e) {}
+					MandelbrotUtils.sleep();
 					
 					images.remove(image);
 					if (images.size() == 0) {
-						menuItemSet.setText("Create Set");
 						menuItemSet.setEnabled(true);
 					}
 					
