@@ -12,7 +12,6 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.PaletteData;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
@@ -47,9 +46,8 @@ public class Mandelbrot {
 		shell = new Shell(new Display(), SWT.CLOSE);
 		title = new MandelbrotTitle(shell, imagesSize);
 		parameters = new MandelbrotParameters(shell.getDisplay().getPrimaryMonitor().getClientArea());
-		shell.setBounds(0, 0, parameters.getWidth(), parameters.getHeight());
 		shell.setLayout(new FillLayout());
-		label = new Label(shell, SWT.BORDER);
+		label = new Label(shell, SWT.NONE);
         label.addMouseListener(new MouseListener() {
         	private double xn1;
         	private double yn1;
@@ -68,13 +66,10 @@ public class Mandelbrot {
 
 			@Override
 			public void mouseUp(MouseEvent e) {
-				if (e.button != 1) return;
-				
 				xn2 = parameters.getUnScaledX(e.x);
 				yn2 = parameters.getUnScaledY(e.y);
 				
-				final Rectangle rect = shell.getDisplay().getPrimaryMonitor().getClientArea();
-				if (parameters.change(xn1, yn1, xn2, yn2, rect)) {
+				if (e.button == 1 && parameters.change(xn1, yn1, xn2, yn2, shell.getDisplay().getPrimaryMonitor().getClientArea())) {
 					shell.setBounds(0, 0, parameters.getWidth(), parameters.getHeight());
 					createAndDrawImage(true);
 				}
@@ -94,7 +89,7 @@ public class Mandelbrot {
 	
 	private void setMenu() {
 		Menu popupMenu = new Menu(label);
-	    MenuItem resetItems = new MenuItem(popupMenu, SWT.NONE);
+		MenuItem resetItems = new MenuItem(popupMenu, SWT.NONE);
 	    resetItems.setText("Reset");
 	    resetItems.addSelectionListener(new SelectionListener() {
 			@Override
@@ -130,6 +125,8 @@ public class Mandelbrot {
 			public void widgetDefaultSelected(SelectionEvent e) {}
 	    });
 	    label.setMenu(popupMenu);
+	    
+	    resetItems.notifyListeners(SWT.Selection, null);
 	}
 	
 	private void createAndPlaySet(MenuItem menuItemSet) {
