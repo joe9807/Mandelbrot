@@ -1,6 +1,7 @@
 package mandelbrot;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -137,8 +138,9 @@ public class Mandelbrot {
 				@Override
 				public void run() {
 					parameters.reduce(shell.getDisplay().getPrimaryMonitor().getClientArea());
+					Date startDate = new Date();
 					images.add(createAndDrawImage(false));
-					title.countImages(imagesSize-images.size());
+					title.countImages(imagesSize-images.size(), MandelbrotUtils.getTimeElapsed(new Date().getTime()-startDate.getTime()));
 					
 					if (images.size() == imagesSize) {
 						playSet(menuItemSet);
@@ -159,11 +161,11 @@ public class Mandelbrot {
 					MandelbrotUtils.sleep();
 					
 					images.remove(image);
+					
+					title.countImages(images.size(), null);
 					if (images.size() == 0) {
 						menuItemSet.setEnabled(true);
 					}
-					
-					title.countImages(images.size());
 				}
 			});
 		});

@@ -1,5 +1,6 @@
 package mandelbrot;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.swt.widgets.Shell;
 
 public class MandelbrotTitle {
@@ -14,7 +15,7 @@ public class MandelbrotTitle {
 	}
 	
 	
-	public void countImages(int value) {
-		shell.setText(NAME+" - "+imagesSize+" : "+value);
+	public void countImages(int value, String timeElapsed) {
+		shell.setText(NAME+" - "+imagesSize+" : "+value+(timeElapsed != null?" : "+timeElapsed:StringUtils.EMPTY));
 	}
 }
