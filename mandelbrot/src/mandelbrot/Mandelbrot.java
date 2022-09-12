@@ -154,6 +154,8 @@ public class Mandelbrot {
 						return;
 					} else if (result == 1) {
 						images.clear();
+					} else {
+						return;
 					}
 				}
 				
