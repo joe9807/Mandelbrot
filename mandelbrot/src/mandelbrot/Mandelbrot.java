@@ -153,6 +153,7 @@ public class Mandelbrot {
 		menuItemSet.setEnabled(false);
 		
 		for (int i=0;i<imagesSize;i++) {
+			final int pos = i;
 			Display.getDefault().asyncExec(new Runnable() {
 				@Override
 				public void run() {
@@ -161,7 +162,7 @@ public class Mandelbrot {
 					images.add(createAndDrawImage(false));
 					title.setImagesTitle(imagesSize, imagesSize-images.size(), MandelbrotUtils.getTimeElapsed(new Date().getTime()-startDate.getTime()));
 					
-					if (images.size() == imagesSize+1) {
+					if (pos == imagesSize-1) {
 						playSet(menuItemSet);
 					}
 				}
