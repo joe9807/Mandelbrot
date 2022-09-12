@@ -1,8 +1,5 @@
 package mandelbrot;
 
-import java.awt.Toolkit;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -128,22 +125,6 @@ public class Mandelbrot {
 			public void widgetDefaultSelected(SelectionEvent e) {}
 	    });
 	    
-	    MenuItem menuItemSet = new MenuItem(popupMenu, SWT.NONE);
-	    menuItemSet.setText("Create/Play Set");
-	    menuItemSet.addSelectionListener(new SelectionListener() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				//createAndPlaySet(-0.9943837320, -0.2997867617);
-				//createAndPlaySet(-0.788547487133255, -0.150889365472422);
-				//createAndPlaySet(-0.994405775524320, -0.300139532909510);
-				
-				createAndPlaySet(-0.655642634968885, -0.379125624450925);
-			}
-
-			public void widgetDefaultSelected(SelectionEvent e) {}
-	    });
-	    
-	    
 	    MenuItem menuItemShowParams = new MenuItem(popupMenu, SWT.NONE);
 	    menuItemShowParams.setText("Show Parameters");
 	    menuItemShowParams.addSelectionListener(new SelectionListener() {
@@ -153,20 +134,6 @@ public class Mandelbrot {
 				dialog.setText("Mandelbrot Parameters");
 				dialog.setMessage(parameters.toString());
 				dialog.open();
-			}
-
-			public void widgetDefaultSelected(SelectionEvent e) {}
-	    });
-	    
-	    
-	    MenuItem menuItemCopyCoords = new MenuItem(popupMenu, SWT.NONE);
-	    menuItemCopyCoords.setText("Copy Coordinates");
-	    menuItemCopyCoords.addSelectionListener(new SelectionListener() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-		        StringSelection selection = new StringSelection(String.format("parameters.increase(%.15f, %.15f);", xn2, yn2));
-		        clipboard.setContents(selection, null);
 			}
 
 			public void widgetDefaultSelected(SelectionEvent e) {}
