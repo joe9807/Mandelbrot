@@ -14,6 +14,6 @@ public class MandelbrotTitle {
 	
 	
 	public void setImagesTitle(int imagesSize, int imagesValue, String timeElapsed) {
-		shell.setText(NAME+" - "+imagesSize+" : "+imagesValue+(timeElapsed != null?" : "+timeElapsed:StringUtils.EMPTY));
+		shell.setText(NAME+StringUtils.SPACE+imagesSize+" : "+imagesValue+(timeElapsed != null?" : "+timeElapsed:StringUtils.EMPTY));
 	}
 }

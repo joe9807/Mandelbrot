@@ -29,7 +29,7 @@ public class Mandelbrot {
 	private Label label;
 	private Shell shell;
 	private List<Image> images = new ArrayList<Image>();
-	private int imagesSize = 40;
+	private int imagesSize = 80;
 	
 	private double xn1;
 	private double yn1;

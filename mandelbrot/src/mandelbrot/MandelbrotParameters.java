@@ -92,7 +92,7 @@ public class MandelbrotParameters {
 	}
 	
 	public void reduce(Rectangle rect) {
-		double stepx = 0.02;
+		double stepx = width()/20;
 		double stepy = stepx/rectRatio();
 		x1+=stepx; x2-=stepx;
 		y1+=stepy; y2-=stepy;
