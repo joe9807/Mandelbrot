@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.IntStream;
 
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
@@ -209,17 +210,23 @@ public class Mandelbrot {
 	}
 	
 	private void playSet() {
-		images.stream().forEach(image->{
-			Display.getDefault().asyncExec(new Runnable() {
-				public void run() {
-					label.setImage(image);
-					MandelbrotUtils.sleep();
-					
-					images.remove(image);
-					title.setImagesTitle(images.size(), null);
-				}
+		boolean result = MessageDialog.openConfirm(shell, "Mandelbrot Parameters", parameters.toString()+"\n\nPress OK to start rendering.");
+
+		if (result){
+			images.stream().forEach(image->{
+				Display.getDefault().asyncExec(new Runnable() {
+					public void run() {
+						label.setImage(image);
+						MandelbrotUtils.sleep();
+						
+						images.remove(image);
+						title.setImagesTitle(images.size(), null);
+					}
+				});
 			});
-		});
+		} else {
+			reset();
+		}
 	}
 	
 	private Image createAndDrawImage(boolean draw) {
@@ -243,18 +250,18 @@ public class Mandelbrot {
 			final int xx = x;
 			final double unScaledX = parameters.getUnScaledX(xx);
 			IntStream.range(0, imageData.height).parallel().forEach(y->{
-				imageData.setPixel(xx, y, MandelbrotUtils.getColor(getIterations(unScaledX, parameters.getUnScaledY(y)), parameters.getMaxIterations()));
+				imageData.setPixel(xx, y, MandelbrotUtils.getColor(getPointIterations(unScaledX, parameters.getUnScaledY(y)), parameters.getIterations()));
 			});
 		}
 	}
 	
-	private int getIterations(double x, double y) {
+	private int getPointIterations(double x, double y) {
 		double xn = x;
 		double yn = y;
 		double module = 0;
 		int iterations = 0;
 		
-		for (;iterations<parameters.getMaxIterations();iterations++) {
+		for (;iterations<parameters.getIterations();iterations++) {
 			double xx = xn*xn;
 			double yy = yn*yn;
 			if ((module=xx+yy)>4) return iterations;//definitely not in set

@@ -6,10 +6,11 @@ import lombok.Data;
 
 @Data
 public class MandelbrotParameters {
-	private static final double END = Math.pow(10, -14);
+	private static final double MAX_SCALE = Math.pow(10, 17);
+	private static final int MAX_IRETATIONS = 2000;
 	private int height;
 	private int width;
-	private int maxIterations = 1000;
+	private int iterations;
 
 	private double scale;
 	
@@ -23,6 +24,7 @@ public class MandelbrotParameters {
 		x2 = 1;
 		y1 = -1.2;
 		y2 = 1.2;
+		iterations = 400;
 		
 		init(screenResolution.width, screenResolution.height);
 	}
@@ -36,6 +38,15 @@ public class MandelbrotParameters {
 			scale = screenWidth/width();
 			width = screenWidth;
 			height = (int)(height()*scale);
+		}
+		
+		//iterations=Double.valueOf(MAX_IRETATIONS*((scale/MAX_SCALE)+0.5)).intValue();
+		if (scale<Math.pow(10, 6)) {
+			iterations = 700;	
+		} else if (scale<Math.pow(10, 12)) {
+			iterations = 1400;
+		} else {
+			iterations = MAX_IRETATIONS;
 		}
 	}
 	
@@ -80,6 +91,7 @@ public class MandelbrotParameters {
 				String.format("width: %s; height: %s; Set Ratio: %,.10f;\n\n", width(), height(), width()/height())+
 				String.format("x1: %,.15f; x2: %,.15f;\ny1: %,.15f; y2: %,.15f;\n", x1, x2, y1, y2)+
 				String.format("center: %,.15f; %,.15f;\n\n", centerX(), centerY())+
+				String.format("iterations: %d\n", iterations)+
 				String.format("scale: %,.0f", scale);
 	}
 	
@@ -89,7 +101,6 @@ public class MandelbrotParameters {
 		x1+=stepx; x2-=stepx;
 		y1+=stepy; y2-=stepy;
 		
-		//maxIterations += maxIterations/120;
 		init(0, rect.height);
 	}
 	
@@ -155,6 +166,6 @@ public class MandelbrotParameters {
 	}
 	
 	public boolean isTheEnd() {
-		return width()<END;
+		return scale>MAX_SCALE;
 	}
 }
