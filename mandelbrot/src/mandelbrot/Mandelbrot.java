@@ -172,7 +172,7 @@ public class Mandelbrot {
 					images.add(createAndDrawImage(false));
 					title.countImagesTitle(imagesSize, imagesSize-images.size(), MandelbrotUtils.getTimeElapsed(new Date().getTime()-startDate.getTime()));
 					
-					if (images.size() == imagesSize) {
+					if (images.size() == imagesSize+1) {
 						playSet(menuItemSet);
 					}
 				}
@@ -186,14 +186,13 @@ public class Mandelbrot {
 			Display.getDefault().asyncExec(new Runnable() {
 				public void run() {
 					label.setImage(image);
+					MandelbrotUtils.sleep();
 					images.remove(image);
 					
 					title.countImagesTitle(imagesSize, images.size(), null);
 					if (images.size() == 0) {
 						menuItemSet.setEnabled(true);
 					}
-					
-					MandelbrotUtils.sleep();
 				}
 			});
 		});
