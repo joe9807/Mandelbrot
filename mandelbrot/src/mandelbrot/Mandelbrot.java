@@ -144,6 +144,19 @@ public class Mandelbrot {
 	    menuItemGoHere.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
+				if (images.size() != 0) {
+					MessageDialog dialog = new MessageDialog(shell, "Render Options", null, "There are rendered images already. Want to render them or start calulating for that point?", MessageDialog.WARNING
+							, new String[] {"Render", "Calculating"}, 0);
+					
+					int result = dialog.open();
+					if (result == 0) {
+						playSet();
+						return;
+					} else if (result == 1) {
+						images.clear();
+					}
+				}
+				
 				reset();
 				createAndPlaySet(xn2, yn2);
 			}
@@ -169,7 +182,13 @@ public class Mandelbrot {
 					title.setImagesTitle(images.size(), MandelbrotUtils.getTimeElapsed(new Date().getTime()-startDate.getTime()));
 					
 					if (parameters.isTheEnd()) {
-						playSet();
+						boolean result = MessageDialog.openConfirm(shell, "Mandelbrot Parameters", parameters.toString()+"\n\nPress OK to start rendering.");
+
+						if (result){
+							playSet();
+						} else {
+							reset();
+						}
 					}
 				}
 			});
@@ -177,23 +196,16 @@ public class Mandelbrot {
 	}
 	
 	private void playSet() {
-		boolean result = MessageDialog.openConfirm(shell, "Mandelbrot Parameters", parameters.toString()+"\n\nPress OK to start rendering.");
-
-		if (result){
-			images.stream().forEach(image->{
-				Display.getDefault().asyncExec(new Runnable() {
-					public void run() {
-						label.setImage(image);
-						MandelbrotUtils.sleep();
-						
-						images.remove(image);
-						title.setImagesTitle(images.size(), null);
-					}
-				});
+		images.stream().forEach(image->{
+			Display.getDefault().asyncExec(new Runnable() {
+				public void run() {
+					label.setImage(image);
+					MandelbrotUtils.sleep();
+					
+					title.setImagesTitle(images.size(), null);
+				}
 			});
-		} else {
-			reset();
-		}
+		});
 	}
 	
 	private Image createAndDrawImage(boolean draw) {
