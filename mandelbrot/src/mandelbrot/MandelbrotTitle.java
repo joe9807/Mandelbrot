@@ -7,13 +7,17 @@ public class MandelbrotTitle {
 	private static final String NAME = "Mandelbrot";
 	private Shell shell;
 	
-	public MandelbrotTitle(Shell shell, int imagesSize, MandelbrotParameters parameters) {
+	public MandelbrotTitle(Shell shell, MandelbrotParameters parameters) {
 		this.shell = shell;
 		shell.setText(NAME);
 	}
 	
 	
-	public void setImagesTitle(int imagesSize, int imagesValue, String timeElapsed) {
-		shell.setText(NAME+StringUtils.SPACE+imagesSize+" : "+imagesValue+(timeElapsed != null?" : "+timeElapsed:StringUtils.EMPTY));
+	public void setImagesTitle(int imagesSize, String timeElapsed) {
+		shell.setText(NAME+StringUtils.SPACE+imagesSize+(timeElapsed != null?" : "+timeElapsed:StringUtils.EMPTY));
+	}
+	
+	public void mouseMoveTitle(double xn, double yn) {
+		shell.setText(NAME+" ("+String.format("%,.10f; %,.10f", xn, yn)+")");
 	}
 }

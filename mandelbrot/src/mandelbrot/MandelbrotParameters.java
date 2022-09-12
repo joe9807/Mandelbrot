@@ -6,6 +6,7 @@ import lombok.Data;
 
 @Data
 public class MandelbrotParameters {
+	private static final double END = Math.pow(10, -10);
 	private int height;
 	private int width;
 	private int maxIterations = 400;
@@ -151,5 +152,9 @@ public class MandelbrotParameters {
 			y2=newCenterY+stepy;
 			init(width, 0);
 		}
+	}
+	
+	public boolean isTheEnd() {
+		return width()<END;
 	}
 }

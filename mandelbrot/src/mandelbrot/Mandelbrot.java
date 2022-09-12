@@ -8,6 +8,7 @@ import java.util.stream.IntStream;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
+import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
@@ -28,7 +29,6 @@ public class Mandelbrot {
 	private Label label;
 	private Shell shell;
 	private List<Image> images = new ArrayList<Image>();
-	private int imagesSize = 80;
 	
 	private double xn1;
 	private double yn1;
@@ -52,7 +52,7 @@ public class Mandelbrot {
 		shell = new Shell(new Display(), SWT.CLOSE | SWT.RESIZE);
 		shell.setLayout(new FillLayout());
 		parameters = new MandelbrotParameters(shell.getDisplay().getPrimaryMonitor().getClientArea());
-		title = new MandelbrotTitle(shell, imagesSize, parameters);
+		title = new MandelbrotTitle(shell, parameters);
 		label = new Label(shell, SWT.NONE);
         label.addMouseListener(new MouseListener() {
 			public void mouseDoubleClick(MouseEvent e) {}
@@ -73,10 +73,19 @@ public class Mandelbrot {
 				if (e.button == 1 && parameters.change(xn1, yn1, xn2, yn2, shell.getDisplay().getPrimaryMonitor().getClientArea())) {
 					shell.setBounds(0, 0, parameters.getWidth(), parameters.getHeight());
 					createAndDrawImage(true);
-					title = new MandelbrotTitle(shell, imagesSize, parameters);
+					title = new MandelbrotTitle(shell, parameters);
 				}
 			}
         });
+        
+        label.addMouseMoveListener(new MouseMoveListener() {
+			@Override
+			public void mouseMove(MouseEvent e) {
+				double nx = parameters.getUnScaledX(e.x);
+				double yn = parameters.getUnScaledY(e.y);
+				title.mouseMoveTitle(nx, yn);
+			}
+		});
         
         setMenu();
         shell.open();
@@ -98,7 +107,7 @@ public class Mandelbrot {
 				parameters = new MandelbrotParameters(shell.getDisplay().getPrimaryMonitor().getClientArea());
 				shell.setBounds(0, 0, parameters.getWidth(), parameters.getHeight());
 				createAndDrawImage(true);
-				title = new MandelbrotTitle(shell, imagesSize, parameters);
+				title = new MandelbrotTitle(shell, parameters);
 			}
 
 			public void widgetDefaultSelected(SelectionEvent e) {}
@@ -109,7 +118,8 @@ public class Mandelbrot {
 	    menuItemSet.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				parameters.increase(xn2, yn2);
+				//parameters.increase(xn2, yn2);
+				parameters.increase(-0.9943837320, -0.2997867617);
 				images.add(createAndDrawImage(true));
 				createAndPlaySet(menuItemSet);
 			}
@@ -139,17 +149,18 @@ public class Mandelbrot {
 	private void createAndPlaySet(MenuItem menuItemSet) {
 		menuItemSet.setEnabled(false);
 		
-		for (int i=0;i<imagesSize;i++) {
-			final int pos = i;
+		for (int i=0;i<1000;i++) {
 			Display.getDefault().asyncExec(new Runnable() {
 				@Override
 				public void run() {
+					if (parameters.isTheEnd()) return;
+					
 					parameters.reduce(shell.getDisplay().getPrimaryMonitor().getClientArea());
 					Date startDate = new Date();
 					images.add(createAndDrawImage(false));
-					title.setImagesTitle(imagesSize, imagesSize-images.size(), MandelbrotUtils.getTimeElapsed(new Date().getTime()-startDate.getTime()));
+					title.setImagesTitle(images.size(), MandelbrotUtils.getTimeElapsed(new Date().getTime()-startDate.getTime()));
 					
-					if (pos == imagesSize-1) {
+					if (parameters.isTheEnd()) {
 						playSet(menuItemSet);
 					}
 				}
@@ -158,7 +169,6 @@ public class Mandelbrot {
 	}
 	
 	private void playSet(MenuItem menuItemSet) {
-		final int imagesSize = images.size();
 		images.stream().forEach(image->{
 			Display.getDefault().asyncExec(new Runnable() {
 				public void run() {
@@ -166,7 +176,7 @@ public class Mandelbrot {
 					MandelbrotUtils.sleep();
 					images.remove(image);
 					
-					title.setImagesTitle(imagesSize, images.size(), null);
+					title.setImagesTitle(images.size(), null);
 					if (images.size() == 0) {
 						menuItemSet.setEnabled(true);
 					}
