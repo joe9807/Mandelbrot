@@ -25,7 +25,6 @@ public class Mandelbrot {
 	private static Mandelbrot instance;
 	private MandelbrotParameters parameters;
 	private MandelbrotTitle title;
-	private MandelbrotMode mode = MandelbrotMode.PIXELS;
 	private Label label;
 	private Shell shell;
 	private List<Image> images = new ArrayList<Image>();
@@ -100,18 +99,6 @@ public class Mandelbrot {
 				shell.setBounds(0, 0, parameters.getWidth(), parameters.getHeight());
 				createAndDrawImage(true);
 				title = new MandelbrotTitle(shell, imagesSize, parameters);
-			}
-
-			public void widgetDefaultSelected(SelectionEvent e) {}
-	    });
-	    
-	    MenuItem menuItemMode = new MenuItem(popupMenu, SWT.NONE);
-	    menuItemMode.setText("Switch to "+mode.anotherMode());
-	    menuItemMode.addSelectionListener(new SelectionListener() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				mode = mode.anotherMode();
-				menuItemMode.setText("Switch to "+mode.anotherMode());
 			}
 
 			public void widgetDefaultSelected(SelectionEvent e) {}
@@ -201,33 +188,7 @@ public class Mandelbrot {
 	}
 	
 	private void mandelbrot(ImageData imageData) {
-		if (mode.isPixels()) {
-			drawFromPixels(imageData);
-		} else {
-			drawFromStep(imageData);
-		}
-	}
-	
-	private void drawFromStep(ImageData imageData) {
-		double x = parameters.getX1();
-		double y = parameters.getY1();
-		
-		while (true) {
-			int scaledX = parameters.getScaledX(x);
-			int scaledY = parameters.getScaledY(y);
-			
-			if (scaledX<imageData.width && scaledY<imageData.height) {
-				imageData.setPixel(scaledX, scaledY, MandelbrotUtils.getColor(getIterations(x, y), parameters.getMaxIterations()));
-			}
-			
-			x+=parameters.getStep();
-			if (x>=parameters.getX2()) {
-				if (y>=parameters.getY2()) break;
-				
-				x = parameters.getX1();
-				y+=parameters.getStep();
-			}
-		}
+		drawFromPixels(imageData);
 	}
 	
 	private void drawFromPixels(ImageData imageData) {

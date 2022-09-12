@@ -10,7 +10,6 @@ public class MandelbrotParameters {
 	private int width;
 	private int maxIterations = 400;
 
-	private double step;
 	private double scale;
 	
 	private double x1;
@@ -23,13 +22,11 @@ public class MandelbrotParameters {
 		x2 = 1;
 		y1 = -1.2;
 		y2 = 1.2;
-		step = 0;
 		
 		init(screenResolution.width, screenResolution.height);
 	}
 	
 	public void init(int screenWidth, int screenHeight) {
-		double scalePrev = scale;
 		if (screenHeight != 0) {
 			scale = screenHeight/height();
 			height = screenHeight;
@@ -38,12 +35,6 @@ public class MandelbrotParameters {
 			scale = screenWidth/width();
 			width = screenWidth;
 			height = (int)(height()*scale);
-		}
-		
-		if (step == 0) {
-			step = 1/scale;
-		} else {
-			step = scalePrev*step/scale;
 		}
 	}
 	
@@ -97,6 +88,7 @@ public class MandelbrotParameters {
 		x1+=stepx; x2-=stepx;
 		y1+=stepy; y2-=stepy;
 		
+		maxIterations += maxIterations/100;
 		init(0, rect.height);
 	}
 	
