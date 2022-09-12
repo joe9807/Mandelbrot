@@ -8,7 +8,6 @@ import java.util.stream.IntStream;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
-import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
@@ -79,16 +78,6 @@ public class Mandelbrot {
 				}
 			}
         });
-        
-        label.addMouseMoveListener(new MouseMoveListener() {
-			@Override
-			public void mouseMove(MouseEvent e) {
-				double nx = parameters.getUnScaledX(e.x);
-				double yn = parameters.getUnScaledY(e.y);
-				title.mouseMoveTitle(nx, yn);
-			}
-		});
-        
         
         setMenu();
         shell.open();
@@ -170,7 +159,7 @@ public class Mandelbrot {
 					parameters.reduce(shell.getDisplay().getPrimaryMonitor().getClientArea());
 					Date startDate = new Date();
 					images.add(createAndDrawImage(false));
-					title.countImagesTitle(imagesSize, imagesSize-images.size(), MandelbrotUtils.getTimeElapsed(new Date().getTime()-startDate.getTime()));
+					title.setImagesTitle(imagesSize, imagesSize-images.size(), MandelbrotUtils.getTimeElapsed(new Date().getTime()-startDate.getTime()));
 					
 					if (images.size() == imagesSize+1) {
 						playSet(menuItemSet);
@@ -189,7 +178,7 @@ public class Mandelbrot {
 					MandelbrotUtils.sleep();
 					images.remove(image);
 					
-					title.countImagesTitle(imagesSize, images.size(), null);
+					title.setImagesTitle(imagesSize, images.size(), null);
 					if (images.size() == 0) {
 						menuItemSet.setEnabled(true);
 					}
@@ -243,8 +232,9 @@ public class Mandelbrot {
 	private void drawFromPixels(ImageData imageData) {
 		for (int x=0;x<imageData.width;x++) {
 			final int xx = x;
+			final double unScaledX = parameters.getUnScaledX(xx);
 			IntStream.range(0, imageData.height).parallel().forEach(y->{
-				imageData.setPixel(xx, y, MandelbrotUtils.getColor(getIterations(parameters.getUnScaledX(xx), parameters.getUnScaledY(y)), parameters.getMaxIterations()));
+				imageData.setPixel(xx, y, MandelbrotUtils.getColor(getIterations(unScaledX, parameters.getUnScaledY(y)), parameters.getMaxIterations()));
 			});
 		}
 	}

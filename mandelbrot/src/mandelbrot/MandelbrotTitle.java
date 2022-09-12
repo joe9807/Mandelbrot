@@ -13,11 +13,7 @@ public class MandelbrotTitle {
 	}
 	
 	
-	public void countImagesTitle(int imagesSize, int imagesValue, String timeElapsed) {
+	public void setImagesTitle(int imagesSize, int imagesValue, String timeElapsed) {
 		shell.setText(NAME+" - "+imagesSize+" : "+imagesValue+(timeElapsed != null?" : "+timeElapsed:StringUtils.EMPTY));
-	}
-	
-	public void mouseMoveTitle(double xn, double yn) {
-		shell.setText(NAME+" ("+String.format("%,.2f; %,.2f", xn, yn)+")");
 	}
 }
