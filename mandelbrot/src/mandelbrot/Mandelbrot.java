@@ -52,9 +52,9 @@ public class Mandelbrot {
 	
 	private void run () {
 		shell = new Shell(new Display(), SWT.CLOSE | SWT.RESIZE);
+		shell.setLayout(new FillLayout());
 		parameters = new MandelbrotParameters(shell.getDisplay().getPrimaryMonitor().getClientArea());
 		title = new MandelbrotTitle(shell, imagesSize, parameters);
-		shell.setLayout(new FillLayout());
 		label = new Label(shell, SWT.NONE);
         label.addMouseListener(new MouseListener() {
 			public void mouseDoubleClick(MouseEvent e) {}
