@@ -18,6 +18,6 @@ public class MandelbrotTitle {
 	}
 	
 	public void mouseMoveTitle(double xn, double yn) {
-		shell.setText(NAME+" ("+String.format("%,.10f; %,.10f", xn, yn)+")");
+		shell.setText(NAME+" ("+String.format("%,.15f; %,.15f", xn, yn)+")");
 	}
 }

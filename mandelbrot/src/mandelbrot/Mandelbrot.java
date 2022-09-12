@@ -1,5 +1,8 @@
 package mandelbrot;
 
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -97,6 +100,20 @@ public class Mandelbrot {
 		}
 	}
 	
+	private void reset() {
+		parameters = new MandelbrotParameters(shell.getDisplay().getPrimaryMonitor().getClientArea());
+		shell.setBounds(0, 0, parameters.getWidth(), parameters.getHeight());
+		createAndDrawImage(true);
+		title = new MandelbrotTitle(shell, parameters);
+	}
+	
+	private void createAndPlaySet(double xTo, double yTo) {
+		parameters.increase(xTo, yTo);
+		
+		images.add(createAndDrawImage(true));
+		createAndPlaySet();
+	}
+	
 	private void setMenu() {
 		Menu popupMenu = new Menu(label);
 		MenuItem resetItems = new MenuItem(popupMenu, SWT.NONE);
@@ -104,10 +121,7 @@ public class Mandelbrot {
 	    resetItems.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				parameters = new MandelbrotParameters(shell.getDisplay().getPrimaryMonitor().getClientArea());
-				shell.setBounds(0, 0, parameters.getWidth(), parameters.getHeight());
-				createAndDrawImage(true);
-				title = new MandelbrotTitle(shell, parameters);
+				reset();
 			}
 
 			public void widgetDefaultSelected(SelectionEvent e) {}
@@ -118,10 +132,11 @@ public class Mandelbrot {
 	    menuItemSet.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				//parameters.increase(xn2, yn2);
-				parameters.increase(-0.9943837320, -0.2997867617);
-				images.add(createAndDrawImage(true));
-				createAndPlaySet(menuItemSet);
+				//createAndPlaySet(-0.9943837320, -0.2997867617);
+				//createAndPlaySet(-0.788547487133255, -0.150889365472422);
+				//createAndPlaySet(-0.994405775524320, -0.300139532909510);
+				
+				createAndPlaySet(-0.655642634968885, -0.379125624450925);
 			}
 
 			public void widgetDefaultSelected(SelectionEvent e) {}
@@ -141,14 +156,39 @@ public class Mandelbrot {
 
 			public void widgetDefaultSelected(SelectionEvent e) {}
 	    });
+	    
+	    
+	    MenuItem menuItemCopyCoords = new MenuItem(popupMenu, SWT.NONE);
+	    menuItemCopyCoords.setText("Copy Coordinates");
+	    menuItemCopyCoords.addSelectionListener(new SelectionListener() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+		        StringSelection selection = new StringSelection(String.format("parameters.increase(%.15f, %.15f);", xn2, yn2));
+		        clipboard.setContents(selection, null);
+			}
+
+			public void widgetDefaultSelected(SelectionEvent e) {}
+	    });
+	    
+	    MenuItem menuItemGoHere = new MenuItem(popupMenu, SWT.NONE);
+	    menuItemGoHere.setText("Go Here");
+	    menuItemGoHere.addSelectionListener(new SelectionListener() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				reset();
+				createAndPlaySet(xn2, yn2);
+			}
+
+			public void widgetDefaultSelected(SelectionEvent e) {}
+	    });
+	    
 	    label.setMenu(popupMenu);
 	    
 	    resetItems.notifyListeners(SWT.Selection, null);
 	}
 	
-	private void createAndPlaySet(MenuItem menuItemSet) {
-		menuItemSet.setEnabled(false);
-		
+	private void createAndPlaySet() {
 		for (int i=0;i<1000;i++) {
 			Display.getDefault().asyncExec(new Runnable() {
 				@Override
@@ -161,25 +201,22 @@ public class Mandelbrot {
 					title.setImagesTitle(images.size(), MandelbrotUtils.getTimeElapsed(new Date().getTime()-startDate.getTime()));
 					
 					if (parameters.isTheEnd()) {
-						playSet(menuItemSet);
+						playSet();
 					}
 				}
 			});
 		}
 	}
 	
-	private void playSet(MenuItem menuItemSet) {
+	private void playSet() {
 		images.stream().forEach(image->{
 			Display.getDefault().asyncExec(new Runnable() {
 				public void run() {
 					label.setImage(image);
 					MandelbrotUtils.sleep();
-					images.remove(image);
 					
+					images.remove(image);
 					title.setImagesTitle(images.size(), null);
-					if (images.size() == 0) {
-						menuItemSet.setEnabled(true);
-					}
 				}
 			});
 		});
