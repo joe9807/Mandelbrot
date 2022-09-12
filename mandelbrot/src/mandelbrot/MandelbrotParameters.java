@@ -63,6 +63,43 @@ public class MandelbrotParameters {
 		return (y/scale)+y1;
 	}
 	
+	private double width() {
+		return x2-x1;
+	}
+	
+	private double height() {
+		return y2-y1;
+	}
+	
+	private double centerX() {
+		return (x2+x1)/2;
+	}
+	
+	private double centerY() {
+		return (y2+y1)/2;
+	}
+	
+	private double rectRatio() {
+		return width()/height();
+	}
+	
+	public String toString() {
+		return String.format("width: %s; height: %s; Shell Ratio: %,.10f;\n", width, height, Double.valueOf(width)/height)+
+				String.format("width: %s; height: %s; Set Ratio: %,.10f;\n\n", width(), height(), width()/height())+
+				String.format("x1: %,.15f; x2: %,.15f;\ny1: %,.15f; y2: %,.15f;\n", x1, x2, y1, y2)+
+				String.format("center: %,.15f; %,.15f;\n\n", centerX(), centerY())+
+				String.format("scale: %,.0f", scale);
+	}
+	
+	public void reduce(Rectangle rect) {
+		double stepx = 0.02;
+		double stepy = stepx/rectRatio();
+		x1+=stepx; x2-=stepx;
+		y1+=stepy; y2-=stepy;
+		
+		init(0, rect.height);
+	}
+	
 	public boolean change(double xn1, double yn1, double xn2, double yn2, Rectangle screenResolution) {
 		if (xn1-xn2 == 0 || yn1 - yn2 == 0) return false;
 		
@@ -91,29 +128,36 @@ public class MandelbrotParameters {
 		return true;
 	}
 	
-	private double width() {
-		return x2-x1;
-	}
-	
-	private double height() {
-		return y2-y1;
-	}
-	
-	private double rectRatio() {
-		return width()/height();
-	}
-	
-	public String toString() {
-		return String.format("height: %s; width; %s; scale: %s; iterations: %s; step: %e;\n", height, width, scale, maxIterations, step)+
-				String.format(" x1: %e; x2: %e;\n y1: %e; y2: %e;\n", x1, x2, y1, y2);
-	}
-	
-	public void reduce(Rectangle rect) {
-		double stepx = 0.02;
-		double stepy = stepx/(rectRatio());
-		x1+=stepx; x2-=stepx;
+	public void increase(double newCenterX, double newCenterY) {
+		double tox = newCenterX<centerX()?newCenterX-x1:x2-newCenterX;
+		double toy = newCenterY<centerY()?newCenterY-y1:y2-newCenterY;
+		double ratio = Double.valueOf(width)/height;
 		
-		y1+=stepy; y2-=stepy;
-		init(0, rect.height);
+		if ((tox/toy)>ratio) {
+			//count height then width
+			if (newCenterY<centerY()) {
+				y2 = 2*newCenterY-y1;
+			} else {
+				y1 = 2*newCenterY-y2;
+			}
+			
+			double stepx = height()*ratio/2;
+			x1=newCenterX-stepx; 
+			x2=newCenterX+stepx;
+			init(0, height);
+		} else {
+			//count width then height
+			
+			if (newCenterX<centerX()) {
+				x2 = 2*newCenterX-x1;
+			} else {
+				x1 = 2*newCenterX-x2;
+			}
+			
+			double stepy = width()/ratio/2;
+			y1=newCenterY-stepy; 
+			y2=newCenterY+stepy;
+			init(width, 0);
+		}
 	}
 }

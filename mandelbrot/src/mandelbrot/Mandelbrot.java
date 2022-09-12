@@ -8,6 +8,7 @@ import java.util.stream.IntStream;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
+import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
@@ -18,6 +19,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 
 public class Mandelbrot {
@@ -29,6 +31,11 @@ public class Mandelbrot {
 	private Shell shell;
 	private List<Image> images = new ArrayList<Image>();
 	private int imagesSize = 40;
+	
+	private double xn1;
+	private double yn1;
+	private double xn2;
+	private double yn2;
 	
 	private static synchronized Mandelbrot getInstance() {
 		if (instance == null) instance = new Mandelbrot();
@@ -44,17 +51,12 @@ public class Mandelbrot {
 	}
 	
 	private void run () {
-		shell = new Shell(new Display(), SWT.CLOSE);
-		title = new MandelbrotTitle(shell, imagesSize);
+		shell = new Shell(new Display(), SWT.CLOSE | SWT.RESIZE);
 		parameters = new MandelbrotParameters(shell.getDisplay().getPrimaryMonitor().getClientArea());
+		title = new MandelbrotTitle(shell, imagesSize, parameters);
 		shell.setLayout(new FillLayout());
 		label = new Label(shell, SWT.NONE);
         label.addMouseListener(new MouseListener() {
-        	private double xn1;
-        	private double yn1;
-        	private double xn2;
-        	private double yn2;
-        	
 			public void mouseDoubleClick(MouseEvent e) {}
 
 			@Override
@@ -73,9 +75,19 @@ public class Mandelbrot {
 				if (e.button == 1 && parameters.change(xn1, yn1, xn2, yn2, shell.getDisplay().getPrimaryMonitor().getClientArea())) {
 					shell.setBounds(0, 0, parameters.getWidth(), parameters.getHeight());
 					createAndDrawImage(true);
+					title = new MandelbrotTitle(shell, imagesSize, parameters);
 				}
 			}
         });
+        
+        label.addMouseMoveListener(new MouseMoveListener() {
+			@Override
+			public void mouseMove(MouseEvent e) {
+				double nx = parameters.getUnScaledX(e.x);
+				double yn = parameters.getUnScaledY(e.y);
+				title.mouseMoveTitle(nx, yn);
+			}
+		});
         
         
         setMenu();
@@ -98,6 +110,7 @@ public class Mandelbrot {
 				parameters = new MandelbrotParameters(shell.getDisplay().getPrimaryMonitor().getClientArea());
 				shell.setBounds(0, 0, parameters.getWidth(), parameters.getHeight());
 				createAndDrawImage(true);
+				title = new MandelbrotTitle(shell, imagesSize, parameters);
 			}
 
 			public void widgetDefaultSelected(SelectionEvent e) {}
@@ -120,7 +133,24 @@ public class Mandelbrot {
 	    menuItemSet.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
+				parameters.increase(xn2, yn2);
+				images.add(createAndDrawImage(true));
 				createAndPlaySet(menuItemSet);
+			}
+
+			public void widgetDefaultSelected(SelectionEvent e) {}
+	    });
+	    
+	    
+	    MenuItem menuItemShowParams = new MenuItem(popupMenu, SWT.NONE);
+	    menuItemShowParams.setText("Show Parameters");
+	    menuItemShowParams.addSelectionListener(new SelectionListener() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				MessageBox dialog = new MessageBox(shell);
+				dialog.setText("Mandelbrot Parameters");
+				dialog.setMessage(parameters.toString());
+				dialog.open();
 			}
 
 			public void widgetDefaultSelected(SelectionEvent e) {}
@@ -140,7 +170,7 @@ public class Mandelbrot {
 					parameters.reduce(shell.getDisplay().getPrimaryMonitor().getClientArea());
 					Date startDate = new Date();
 					images.add(createAndDrawImage(false));
-					title.countImages(imagesSize-images.size(), MandelbrotUtils.getTimeElapsed(new Date().getTime()-startDate.getTime()));
+					title.countImagesTitle(imagesSize, imagesSize-images.size(), MandelbrotUtils.getTimeElapsed(new Date().getTime()-startDate.getTime()));
 					
 					if (images.size() == imagesSize) {
 						playSet(menuItemSet);
@@ -151,21 +181,19 @@ public class Mandelbrot {
 	}
 	
 	private void playSet(MenuItem menuItemSet) {
-		MandelbrotUtils.sleep();
-		
+		final int imagesSize = images.size();
 		images.stream().forEach(image->{
 			Display.getDefault().asyncExec(new Runnable() {
 				public void run() {
 					label.setImage(image);
-					
-					MandelbrotUtils.sleep();
-					
 					images.remove(image);
 					
-					title.countImages(images.size(), null);
+					title.countImagesTitle(imagesSize, images.size(), null);
 					if (images.size() == 0) {
 						menuItemSet.setEnabled(true);
 					}
+					
+					MandelbrotUtils.sleep();
 				}
 			});
 		});
@@ -176,7 +204,7 @@ public class Mandelbrot {
 		
 		mandelbrot(imageData);
 		
-		Image image = new Image(label.getDisplay(), imageData);
+		Image image = new Image(shell.getDisplay(), imageData);
 		if (draw) {
 			label.setImage(image);
 		}
