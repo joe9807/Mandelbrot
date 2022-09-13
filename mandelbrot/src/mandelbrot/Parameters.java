@@ -5,7 +5,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import lombok.Data;
 
 @Data
-public class MandelbrotParameters {
+public class Parameters {
 	private static final double MAX_SCALE = Math.pow(10, 17);
 	private static final int MAX_IRETATIONS = 2000;
 	private int height;
@@ -19,7 +19,7 @@ public class MandelbrotParameters {
 	private double y1;
 	private double y2;
 	
-	public MandelbrotParameters(Rectangle screenResolution) {
+	public Parameters(Rectangle screenResolution) {
 		x1= -2;
 		x2 = 1;
 		y1 = -1.2;

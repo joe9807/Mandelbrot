@@ -7,7 +7,7 @@ public class MandelbrotTitle {
 	private static final String NAME = "Mandelbrot";
 	private Shell shell;
 	
-	public MandelbrotTitle(Shell shell, MandelbrotParameters parameters) {
+	public MandelbrotTitle(Shell shell, Parameters parameters) {
 		this.shell = shell;
 		shell.setText(NAME);
 	}

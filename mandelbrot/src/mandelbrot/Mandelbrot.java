@@ -25,7 +25,7 @@ import org.eclipse.swt.widgets.Shell;
 
 public class Mandelbrot {
 	private static Mandelbrot instance;
-	private MandelbrotParameters parameters;
+	private Parameters parameters;
 	private MandelbrotTitle title;
 	private Label label;
 	private Shell shell;
@@ -52,7 +52,7 @@ public class Mandelbrot {
 	private void run () {
 		shell = new Shell(new Display(), SWT.CLOSE | SWT.RESIZE);
 		shell.setLayout(new FillLayout());
-		parameters = new MandelbrotParameters(shell.getDisplay().getPrimaryMonitor().getClientArea());
+		parameters = new Parameters(shell.getDisplay().getPrimaryMonitor().getClientArea());
 		title = new MandelbrotTitle(shell, parameters);
 		label = new Label(shell, SWT.NONE);
         label.addMouseListener(new MouseListener() {
@@ -99,7 +99,7 @@ public class Mandelbrot {
 	}
 	
 	private void reset() {
-		parameters = new MandelbrotParameters(shell.getDisplay().getPrimaryMonitor().getClientArea());
+		parameters = new Parameters(shell.getDisplay().getPrimaryMonitor().getClientArea());
 		shell.setBounds(0, 0, parameters.getWidth(), parameters.getHeight());
 		createAndDrawImage(true);
 		title = new MandelbrotTitle(shell, parameters);
@@ -131,7 +131,7 @@ public class Mandelbrot {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				MessageBox dialog = new MessageBox(shell);
-				dialog.setText(Constants.DIALOG_TITLE);
+				dialog.setText(Constants.PARAMETERS_TITLE);
 				dialog.setMessage(parameters.toString());
 				dialog.open();
 			}
@@ -145,7 +145,7 @@ public class Mandelbrot {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (images.size() != 0) {
-					MessageDialog dialog = new MessageDialog(shell, "Render Options", null, Constants.CONFIRM_MESSAGE, MessageDialog.WARNING, Constants.CONFIRM_BUTTONS, 0);
+					MessageDialog dialog = new MessageDialog(shell, Constants.DIALOG_TITLE, null, Constants.CONFIRM_MESSAGE, MessageDialog.WARNING, Constants.CONFIRM_BUTTONS, 0);
 					
 					int result = dialog.open();
 					if (result == 0) {
@@ -183,9 +183,7 @@ public class Mandelbrot {
 					title.setImagesTitle(images.size(), Utils.getTimeElapsed(new Date().getTime()-startDate.getTime()));
 					
 					if (parameters.isTheEnd()) {
-						boolean result = MessageDialog.openConfirm(shell, Constants.DIALOG_TITLE, parameters.toString()+"\n\nPress OK to start rendering.");
-
-						if (result){
+						if (MessageDialog.openConfirm(shell, Constants.PARAMETERS_TITLE, parameters.toString()+"\n\nPress OK to start rendering.")){
 							playSet();
 						} else {
 							reset();
