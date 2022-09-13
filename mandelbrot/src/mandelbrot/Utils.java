@@ -1,6 +1,6 @@
 package mandelbrot;
 
-public class MandelbrotUtils {
+public class Utils {
 	public static int getColor(int iterations, int maxIterations) {
 		int color = 0;
 		if (iterations > 0) {//near to the set

@@ -21,7 +21,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.MessageBox;
-import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Shell; 
 
 public class Mandelbrot {
 	private static Mandelbrot instance;
@@ -115,7 +115,7 @@ public class Mandelbrot {
 	private void setMenu() {
 		Menu popupMenu = new Menu(label);
 		MenuItem resetItems = new MenuItem(popupMenu, SWT.NONE);
-	    resetItems.setText("Reset");
+	    resetItems.setText(Constants.RESET_TEXT);
 	    resetItems.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -126,12 +126,12 @@ public class Mandelbrot {
 	    });
 	    
 	    MenuItem menuItemShowParams = new MenuItem(popupMenu, SWT.NONE);
-	    menuItemShowParams.setText("Show Parameters");
+	    menuItemShowParams.setText(Constants.SHOW_TEXT);
 	    menuItemShowParams.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				MessageBox dialog = new MessageBox(shell);
-				dialog.setText("Mandelbrot Parameters");
+				dialog.setText(Constants.DIALOG_TITLE);
 				dialog.setMessage(parameters.toString());
 				dialog.open();
 			}
@@ -140,13 +140,12 @@ public class Mandelbrot {
 	    });
 	    
 	    MenuItem menuItemGoHere = new MenuItem(popupMenu, SWT.NONE);
-	    menuItemGoHere.setText("Go Here");
+	    menuItemGoHere.setText(Constants.GO_TEXT);
 	    menuItemGoHere.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (images.size() != 0) {
-					MessageDialog dialog = new MessageDialog(shell, "Render Options", null, "There are rendered images already. Want to render them or start calulating for that point?", MessageDialog.WARNING
-							, new String[] {"Render", "Calculating"}, 0);
+					MessageDialog dialog = new MessageDialog(shell, "Render Options", null, Constants.CONFIRM_MESSAGE, MessageDialog.WARNING, Constants.CONFIRM_BUTTONS, 0);
 					
 					int result = dialog.open();
 					if (result == 0) {
@@ -181,10 +180,10 @@ public class Mandelbrot {
 					parameters.reduce(shell.getDisplay().getPrimaryMonitor().getClientArea());
 					Date startDate = new Date();
 					images.add(createAndDrawImage(false));
-					title.setImagesTitle(images.size(), MandelbrotUtils.getTimeElapsed(new Date().getTime()-startDate.getTime()));
+					title.setImagesTitle(images.size(), Utils.getTimeElapsed(new Date().getTime()-startDate.getTime()));
 					
 					if (parameters.isTheEnd()) {
-						boolean result = MessageDialog.openConfirm(shell, "Mandelbrot Parameters", parameters.toString()+"\n\nPress OK to start rendering.");
+						boolean result = MessageDialog.openConfirm(shell, Constants.DIALOG_TITLE, parameters.toString()+"\n\nPress OK to start rendering.");
 
 						if (result){
 							playSet();
@@ -202,7 +201,7 @@ public class Mandelbrot {
 			Display.getDefault().asyncExec(new Runnable() {
 				public void run() {
 					label.setImage(image);
-					MandelbrotUtils.sleep();
+					Utils.sleep();
 					
 					title.setImagesTitle(images.size(), null);
 				}
@@ -231,7 +230,7 @@ public class Mandelbrot {
 			final int xx = x;
 			final double unScaledX = parameters.getUnScaledX(xx);
 			IntStream.range(0, imageData.height).parallel().forEach(y->{
-				imageData.setPixel(xx, y, MandelbrotUtils.getColor(getPointIterations(unScaledX, parameters.getUnScaledY(y)), parameters.getIterations()));
+				imageData.setPixel(xx, y, Utils.getColor(getPointIterations(unScaledX, parameters.getUnScaledY(y)), parameters.getIterations()));
 			});
 		}
 	}
