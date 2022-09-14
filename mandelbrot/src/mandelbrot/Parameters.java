@@ -7,13 +7,12 @@ import lombok.Data;
 @Data
 public class Parameters {
 	private static final double MAX_SCALE = Math.pow(10, 17);
-	private static final int MAX_IRETATIONS = 2000;
+	
 	private int height;
 	private int width;
 	private int iterations;
 
 	private double scale;
-	
 	private double x1;
 	private double x2;
 	private double y1;
@@ -24,7 +23,6 @@ public class Parameters {
 		x2 = 1;
 		y1 = -1.2;
 		y2 = 1.2;
-		iterations = 400;
 		
 		init(screenResolution.width, screenResolution.height);
 	}
@@ -40,14 +38,7 @@ public class Parameters {
 			height = (int)(height()*scale);
 		}
 		
-		//iterations=Double.valueOf(MAX_IRETATIONS*((scale/MAX_SCALE)+0.5)).intValue();
-		if (scale<Math.pow(10, 6)) {
-			iterations = 700;	
-		} else if (scale<Math.pow(10, 12)) {
-			iterations = 1400;
-		} else {
-			iterations = MAX_IRETATIONS;
-		}
+		iterations = (int)(500*Math.log10(scale)/2);
 	}
 	
 	public int getScaledX(double x) {

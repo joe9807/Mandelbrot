@@ -8,4 +8,5 @@ public final class Constants {
 	protected static final String SHOW_TEXT = "Show Parameters";
 	protected static final String GO_TEXT = "Go Here";
 	protected static final String[] CONFIRM_BUTTONS = {"Render", "Calculating"};
+	protected static final String[] INFO_BUTTONS = {"OK", "Cancel"};
 }

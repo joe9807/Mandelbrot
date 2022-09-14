@@ -20,7 +20,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
-import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell; 
 
 public class Mandelbrot {
@@ -52,8 +51,6 @@ public class Mandelbrot {
 	private void run () {
 		shell = new Shell(new Display(), SWT.CLOSE | SWT.RESIZE);
 		shell.setLayout(new FillLayout());
-		parameters = new Parameters(shell.getDisplay().getPrimaryMonitor().getClientArea());
-		title = new MandelbrotTitle(shell, parameters);
 		label = new Label(shell, SWT.NONE);
         label.addMouseListener(new MouseListener() {
 			public void mouseDoubleClick(MouseEvent e) {}
@@ -130,10 +127,11 @@ public class Mandelbrot {
 	    menuItemShowParams.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				MessageBox dialog = new MessageBox(shell);
-				dialog.setText(Constants.PARAMETERS_TITLE);
-				dialog.setMessage(parameters.toString());
-				dialog.open();
+				IterationsDialog dialog = new IterationsDialog(shell, parameters);
+				if (dialog.open() == 0) {
+					parameters.setIterations(dialog.getIterations());
+					createAndDrawImage(true);
+				}
 			}
 
 			public void widgetDefaultSelected(SelectionEvent e) {}
