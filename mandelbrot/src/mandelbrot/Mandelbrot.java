@@ -127,7 +127,7 @@ public class Mandelbrot {
 	    menuItemShowParams.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				IterationsDialog dialog = new IterationsDialog(shell, parameters);
+				ParametersDialog dialog = new ParametersDialog(shell, parameters);
 				if (dialog.open() == 0) {
 					parameters.setIterations(dialog.getIterations());
 					createAndDrawImage(true);

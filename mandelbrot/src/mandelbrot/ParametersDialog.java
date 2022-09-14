@@ -11,12 +11,12 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-public class IterationsDialog extends MessageDialog {
+public class ParametersDialog extends MessageDialog {
 	private Integer iterations;
 	private Text text;
 	private Parameters parameters;
 	
-	public IterationsDialog(Shell parentShell, Parameters parameters) {
+	public ParametersDialog(Shell parentShell, Parameters parameters) {
 		super(parentShell, Constants.PARAMETERS_TITLE, null, parameters.toString(), MessageDialog.INFORMATION, Constants.INFO_BUTTONS, 0);
 		this.parameters = parameters;
 	}
