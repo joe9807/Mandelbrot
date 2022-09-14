@@ -153,17 +153,6 @@ public class Mandelbrot {
 			public void widgetDefaultSelected(SelectionEvent e) {}
 	    });
 	    
-	    MenuItem menuItemSave = new MenuItem(popupMenu, SWT.NONE);
-	    menuItemSave.setText(Constants.SAVE_IMAGES);
-	    menuItemSave.addSelectionListener(new SelectionListener() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				Utils.saveImages(images, title);
-			}
-
-			public void widgetDefaultSelected(SelectionEvent e) {}
-	    });
-	    
 	    label.setMenu(popupMenu);
 	    
 	    resetItems.notifyListeners(SWT.Selection, null);
@@ -200,7 +189,14 @@ public class Mandelbrot {
 					label.setImage(image);
 					Utils.sleep();
 					
-					title.setImagesTitle(images.indexOf(image), null);
+					int index = images.indexOf(image);
+					title.setImagesTitle(images.size()-index, null);
+					
+					if (index == images.size()-1) {
+						if (MessageDialog.openConfirm(shell, Constants.SAVE_TITLE, Constants.SAVE_MESSAGE)) {
+							Utils.saveImages(images, title);
+						}
+					}
 				}
 			});
 		});
