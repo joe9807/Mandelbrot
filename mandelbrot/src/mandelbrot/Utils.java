@@ -10,6 +10,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.ImageLoader;
+import org.eclipse.swt.widgets.Display;
 
 public class Utils {
 	public static int getColor(int iterations, int maxIterations) {
@@ -65,23 +66,30 @@ public class Utils {
 		} catch (InterruptedException e) {}
 	}
 	
-	public static void saveImages(List<Image> images) {
+	public static void saveImages(List<Image> images, MandelbrotTitle title) {
 		if (images == null || images.size() == 0) return;
 		
-		ImageLoader saver = new ImageLoader();
-		AtomicInteger pos = new AtomicInteger(0);
-		File imagesDir = new File("sets");
-		int max = Arrays.asList(imagesDir.listFiles()).stream().map(imageDir->{
+		int max = Arrays.asList(new File("sets").listFiles()).stream().map(imageDir->{
 			String number = imageDir.getName().replaceAll("set", StringUtils.EMPTY);
 			return Integer.valueOf(number);
 		}).max(Integer::compare).orElse(0);
 		
-		File imageDir = new File("sets/set"+max);
+		File imageDir = new File("sets/set"+(max+1));
 		imageDir.mkdir();
+
+		ImageLoader saver = new ImageLoader();
+		AtomicInteger pos = new AtomicInteger(0);
+		String format = imageDir.getAbsolutePath()+"/img%03d.png";
 		
 		images.stream().forEach(image->{
-			saver.data = new ImageData[] { image.getImageData() };
-			saver.save(imageDir.getAbsolutePath()+"/image"+pos.incrementAndGet()+".png", SWT.IMAGE_PNG);
+			Display.getDefault().asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					saver.data = new ImageData[] { image.getImageData() };
+					saver.save(String.format(format, pos.getAndIncrement()), SWT.IMAGE_PNG);
+					title.setImagesTitle(pos.get(), null);
+				}
+			});
 		});
 	}
 }

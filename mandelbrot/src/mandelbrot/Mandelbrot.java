@@ -158,7 +158,7 @@ public class Mandelbrot {
 	    menuItemSave.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				Utils.saveImages(images);
+				Utils.saveImages(images, title);
 			}
 
 			public void widgetDefaultSelected(SelectionEvent e) {}
@@ -200,7 +200,7 @@ public class Mandelbrot {
 					label.setImage(image);
 					Utils.sleep();
 					
-					title.setImagesTitle(images.size(), null);
+					title.setImagesTitle(images.indexOf(image), null);
 				}
 			});
 		});
