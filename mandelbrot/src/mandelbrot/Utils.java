@@ -1,5 +1,16 @@
 package mandelbrot;
 
+import java.io.File;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import org.apache.commons.lang3.StringUtils;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.ImageLoader;
+
 public class Utils {
 	public static int getColor(int iterations, int maxIterations) {
 		int color = 0;
@@ -52,5 +63,25 @@ public class Utils {
 		try {
 			Thread.sleep(100);
 		} catch (InterruptedException e) {}
+	}
+	
+	public static void saveImages(List<Image> images) {
+		if (images == null || images.size() == 0) return;
+		
+		ImageLoader saver = new ImageLoader();
+		AtomicInteger pos = new AtomicInteger(0);
+		File imagesDir = new File("sets");
+		int max = Arrays.asList(imagesDir.listFiles()).stream().map(imageDir->{
+			String number = imageDir.getName().replaceAll("set", StringUtils.EMPTY);
+			return Integer.valueOf(number);
+		}).max(Integer::compare).orElse(0);
+		
+		File imageDir = new File("sets/set"+max);
+		imageDir.mkdir();
+		
+		images.stream().forEach(image->{
+			saver.data = new ImageData[] { image.getImageData() };
+			saver.save(imageDir.getAbsolutePath()+"/image"+pos.incrementAndGet()+".png", SWT.IMAGE_PNG);
+		});
 	}
 }

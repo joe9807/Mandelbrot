@@ -9,7 +9,6 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
-import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
@@ -75,15 +74,6 @@ public class Mandelbrot {
 				}
 			}
         });
-        
-        label.addMouseMoveListener(new MouseMoveListener() {
-			@Override
-			public void mouseMove(MouseEvent e) {
-				double nx = parameters.getUnScaledX(e.x);
-				double yn = parameters.getUnScaledY(e.y);
-				title.mouseMoveTitle(nx, yn);
-			}
-		});
         
         setMenu();
         shell.open();
@@ -158,6 +148,17 @@ public class Mandelbrot {
 				
 				reset();
 				createAndPlaySet(xn2, yn2);
+			}
+
+			public void widgetDefaultSelected(SelectionEvent e) {}
+	    });
+	    
+	    MenuItem menuItemSave = new MenuItem(popupMenu, SWT.NONE);
+	    menuItemSave.setText(Constants.SAVE_IMAGES);
+	    menuItemSave.addSelectionListener(new SelectionListener() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				Utils.saveImages(images);
 			}
 
 			public void widgetDefaultSelected(SelectionEvent e) {}

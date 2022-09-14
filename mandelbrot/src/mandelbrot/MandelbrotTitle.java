@@ -16,8 +16,4 @@ public class MandelbrotTitle {
 	public void setImagesTitle(int imagesSize, String timeElapsed) {
 		shell.setText(NAME+StringUtils.SPACE+imagesSize+(timeElapsed != null?" : "+timeElapsed:StringUtils.EMPTY));
 	}
-	
-	public void mouseMoveTitle(double xn, double yn) {
-		shell.setText(NAME+" ("+String.format("%,.15f; %,.15f", xn, yn)+")");
-	}
 }
