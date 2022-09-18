@@ -38,7 +38,7 @@ public class Parameters {
 			height = (int)(height()*scale);
 		}
 		
-		iterations = (int)(500*Math.log10(scale)/2);
+		iterations = (int)(250*Math.log10(scale));
 	}
 	
 	public int getScaledX(double x) {
