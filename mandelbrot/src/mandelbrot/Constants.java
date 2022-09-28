@@ -11,4 +11,5 @@ public final class Constants {
 	protected static final String GO_TEXT = "Go Here";
 	protected static final String[] CONFIRM_BUTTONS = {"Render", "Calculating"};
 	protected static final String[] INFO_BUTTONS = {"OK", "Cancel"};
+	protected static final String IMAGE_FORMAT = "img%03d.png";
 }

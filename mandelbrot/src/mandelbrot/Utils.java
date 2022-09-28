@@ -74,20 +74,23 @@ public class Utils {
 			return Integer.valueOf(number);
 		}).max(Integer::compare).orElse(0);
 		
-		File imageDir = new File("sets/set"+(max+1));
-		imageDir.mkdir();
+		File imagesDir = new File("sets/set"+(max+1));
+		imagesDir.mkdir();
 
 		ImageLoader saver = new ImageLoader();
 		AtomicInteger pos = new AtomicInteger(0);
-		String format = imageDir.getAbsolutePath()+"/img%03d.png";
 		
 		images.stream().forEach(image->{
 			Display.getDefault().asyncExec(new Runnable() {
 				@Override
 				public void run() {
 					saver.data = new ImageData[] { image.getImageData() };
-					saver.save(String.format(format, pos.getAndIncrement()), SWT.IMAGE_PNG);
+					saver.save(String.format(imagesDir.getAbsolutePath()+"/"+Constants.IMAGE_FORMAT, pos.getAndIncrement()), SWT.IMAGE_PNG);
 					title.setImagesTitle(pos.get(), null);
+					
+					if (pos.get() == images.size()) {
+						new Thread(new Video(imagesDir.getAbsolutePath())).start();
+					}
 				}
 			});
 		});
