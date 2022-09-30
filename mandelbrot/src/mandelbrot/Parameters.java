@@ -24,7 +24,22 @@ public class Parameters {
 		y1 = -1.2;
 		y2 = 1.2;
 		
-		init(screenResolution.width, screenResolution.height);
+		if (screenResolution != null) {
+			init(screenResolution.width, screenResolution.height);
+		}
+	}
+	
+	public Parameters clone() {
+		Parameters parameters = new Parameters(null);
+		parameters.setX1(x1);
+		parameters.setX2(x2);
+		parameters.setY1(y1);
+		parameters.setY2(y2);
+		parameters.setIterations(iterations);
+		parameters.setScale(scale);
+		parameters.setWidth(width);
+		parameters.setHeight(height);
+		return parameters;
 	}
 	
 	public void init(int screenWidth, int screenHeight) {
@@ -65,11 +80,11 @@ public class Parameters {
 		return y2-y1;
 	}
 	
-	private double centerX() {
+	public double centerX() {
 		return (x2+x1)/2;
 	}
 	
-	private double centerY() {
+	public double centerY() {
 		return (y2+y1)/2;
 	}
 	

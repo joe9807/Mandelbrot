@@ -93,10 +93,31 @@ public class Mandelbrot {
 	}
 	
 	private void createAndPlaySet(double xTo, double yTo) {
-		parameters.increase(xTo, yTo);
+		double xNow = parameters.centerX();
+		double yNow = parameters.centerY();
+		double centerStep = 20;
 		
-		images.add(createAndDrawImage(true));
-		createAndPlaySet();
+		Parameters oldParameters = parameters.clone();
+		for (int i=0;i<=centerStep;i++) {
+			final int ii=i;
+			double xShift = i*Math.abs(xNow-xTo)/centerStep;
+			double yShift = i*Math.abs(yNow-yTo)/centerStep;
+			
+			Display.getDefault().asyncExec(new Runnable() {
+				public void run() {
+					parameters.increase(xNow+(xTo>xNow?1:-1)*xShift, yNow+(yTo>yNow?1:-1)*yShift);
+					Date startDate = new Date();
+					images.add(createAndDrawImage(false));
+					title.setImagesTitle(images.size(), Utils.getTimeElapsed(new Date().getTime()-startDate.getTime()));
+					
+					if (ii != centerStep) {
+						parameters = oldParameters;
+					} else {
+						createAndPlaySet();
+					}
+				}
+			});
+		}
 	}
 	
 	private void setMenu() {
