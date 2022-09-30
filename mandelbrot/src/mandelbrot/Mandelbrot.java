@@ -86,6 +86,7 @@ public class Mandelbrot {
 	}
 	
 	private void reset() {
+		images.clear();
 		parameters = new Parameters(shell.getDisplay().getPrimaryMonitor().getClientArea());
 		shell.setBounds(0, 0, parameters.getWidth(), parameters.getHeight());
 		createAndDrawImage(true);
@@ -156,14 +157,10 @@ public class Mandelbrot {
 				if (images.size() != 0) {
 					MessageDialog dialog = new MessageDialog(shell, Constants.DIALOG_TITLE, null, Constants.CONFIRM_MESSAGE, MessageDialog.WARNING, Constants.CONFIRM_BUTTONS, 0);
 					
-					int result = dialog.open();
-					if (result == 0) {
-						playSet();
-						return;
-					} else if (result == 1) {
-						images.clear();
-					} else {
-						return;
+					switch (dialog.open()) {
+						case 0: playSet(); return;
+						case 1: break;
+						default: return;
 					}
 				}
 				
