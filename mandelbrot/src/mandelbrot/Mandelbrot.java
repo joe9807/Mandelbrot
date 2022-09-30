@@ -69,8 +69,8 @@ public class Mandelbrot {
 				
 				if (e.button == 1 && parameters.change(xn1, yn1, xn2, yn2, shell.getDisplay().getPrimaryMonitor().getClientArea())) {
 					shell.setBounds(0, 0, parameters.getWidth(), parameters.getHeight());
-					createAndDrawImage(true);
 					title = new MandelbrotTitle(shell, parameters);
+					createAndDrawImage(true);
 				}
 			}
         });
@@ -89,8 +89,8 @@ public class Mandelbrot {
 		images.clear();
 		parameters = new Parameters(shell.getDisplay().getPrimaryMonitor().getClientArea());
 		shell.setBounds(0, 0, parameters.getWidth(), parameters.getHeight());
-		createAndDrawImage(true);
 		title = new MandelbrotTitle(shell, parameters);
+		createAndDrawImage(true);
 	}
 	
 	private void createAndPlaySet(double xTo, double yTo) {
@@ -107,9 +107,7 @@ public class Mandelbrot {
 			Display.getDefault().asyncExec(new Runnable() {
 				public void run() {
 					parameters.increase(xNow+(xTo>xNow?1:-1)*xShift, yNow+(yTo>yNow?1:-1)*yShift);
-					Date startDate = new Date();
 					images.add(createAndDrawImage(false));
-					title.setImagesTitle(images.size(), Utils.getTimeElapsed(new Date().getTime()-startDate.getTime()));
 					
 					if (ii != centerStep) {
 						parameters = oldParameters;
@@ -184,9 +182,7 @@ public class Mandelbrot {
 					if (parameters.isTheEnd()) return;
 					
 					parameters.reduce(shell.getDisplay().getPrimaryMonitor().getClientArea());
-					Date startDate = new Date();
 					images.add(createAndDrawImage(false));
-					title.setImagesTitle(images.size(), Utils.getTimeElapsed(new Date().getTime()-startDate.getTime()));
 					
 					if (parameters.isTheEnd()) {
 						if (MessageDialog.openConfirm(shell, Constants.PARAMETERS_TITLE, parameters.toString()+"\n\nPress OK to start rendering.")){
@@ -223,7 +219,9 @@ public class Mandelbrot {
 	private Image createAndDrawImage(boolean draw) {
 		ImageData imageData = new ImageData(parameters.getWidth(), parameters.getHeight(), 24, new PaletteData(0xFF , 0xFF00 , 0xFF0000));
 		
+		Date startDate = new Date();
 		mandelbrot(imageData);
+		title.setImagesTitle(images.size(), Utils.getTimeElapsed(new Date().getTime()-startDate.getTime()));
 		
 		Image image = new Image(shell.getDisplay(), imageData);
 		if (draw) {
