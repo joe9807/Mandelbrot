@@ -229,12 +229,8 @@ public class Mandelbrot {
 		}
 		return image;
 	}
-	
+
 	private void mandelbrot(ImageData imageData) {
-		drawFromPixels(imageData);
-	}
-	
-	private void drawFromPixels(ImageData imageData) {
 		for (int x=0;x<imageData.width;x++) {
 			final int xx = x;
 			final double unScaledX = parameters.getUnScaledX(xx);

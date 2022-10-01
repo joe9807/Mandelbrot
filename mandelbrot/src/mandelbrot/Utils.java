@@ -14,13 +14,12 @@ import org.eclipse.swt.widgets.Display;
 
 public class Utils {
 	public static int getColor(int iterations, int maxIterations) {
-		int color = 0;
 		if (iterations > 0) {//near to the set
-			int rgb = (int) (iterations*255/maxIterations);
-			color = (rgb << 16) | (rgb << 8) | rgb;
+			int rgb = iterations*255/maxIterations;
+			return (rgb << 16) | (rgb << 8) | rgb;
 		}
 		
-		return color;
+		return 0;
 	}
 	
 	public static String getTimeElapsed(long elapsed) {
