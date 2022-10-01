@@ -19,7 +19,7 @@ public class Parameters {
 	private double y2;
 	
 	public Parameters(Rectangle screenResolution) {
-		x1= -2;
+		x1= -2.1;
 		x2 = 1;
 		y1 = -1.2;
 		y2 = 1.2;
