@@ -56,14 +56,6 @@ public class Parameters {
 		iterations = (int)(250*Math.log10(scale));
 	}
 	
-	public int getScaledX(double x) {
-		return (int)(x*scale-x1*scale);
-	}
-	
-	public int getScaledY(double y) {
-		return (int)(y*scale-y1*scale);
-	}
-	
 	public double getUnScaledX(double x) {
 		return (x/scale)+x1;
 	}
