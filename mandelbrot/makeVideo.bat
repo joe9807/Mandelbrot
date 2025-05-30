@@ -1,1 +1,1 @@
-call ffmpeg -framerate 15 -i img%%%%03d.png -c:v libx264 -pix_fmt yuv420p video.mp4
+call ffmpeg -framerate 10 -i img%%%%03d.png -vf "scale=-2:1040" -c:v libx264 -pix_fmt yuv420p video.mp4
