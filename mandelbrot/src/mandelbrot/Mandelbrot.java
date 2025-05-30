@@ -251,10 +251,8 @@ public class Mandelbrot {
 			double yy = yn*yn;
 			if ((module=xx+yy)>4) return iterations;//definitely not in set
 			
-			double xn1 = xx-yy+x;
 			yn = 2*xn*yn+y;
-			
-			xn = xn1;
+			xn = xx-yy+x;
 		}
 		
 		return module<4?0:iterations;//in set/not in set

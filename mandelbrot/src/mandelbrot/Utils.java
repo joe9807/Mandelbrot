@@ -68,7 +68,9 @@ public class Utils {
 	public static void saveImages(List<Image> images, MandelbrotTitle title) {
 		if (images == null || images.size() == 0) return;
 		
-		int max = Arrays.asList(new File("sets").listFiles()).stream().map(imageDir->{
+		File sets = new File("sets");
+		sets.mkdir();
+		int max = Arrays.asList(sets.listFiles()).stream().map(imageDir->{
 			String number = imageDir.getName().replaceAll("set", StringUtils.EMPTY);
 			return Integer.valueOf(number);
 		}).max(Integer::compare).orElse(0);
