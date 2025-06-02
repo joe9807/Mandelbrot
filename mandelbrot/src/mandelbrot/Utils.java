@@ -13,10 +13,12 @@ import org.eclipse.swt.graphics.ImageLoader;
 import org.eclipse.swt.widgets.Display;
 
 public class Utils {
-	public static int getColor(int iterations, int maxIterations) {
+	public static int getColor(int iterations, Parameters parameters) {
 		if (iterations > 0) {//near to the set
-			int rgb = iterations*255/maxIterations;
-			return (rgb << 16) | (rgb << 8) | rgb;
+			int r = iterations*parameters.getR()/parameters.getIterations();
+			int g = iterations*parameters.getG()/parameters.getIterations();
+			int b = iterations*parameters.getB()/parameters.getIterations();
+			return (b << 16) | (g << 8) | r;
 		}
 		
 		return 0;

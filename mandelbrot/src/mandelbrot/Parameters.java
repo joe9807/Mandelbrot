@@ -8,6 +8,10 @@ import lombok.Data;
 public class Parameters {
 	private static final double MAX_SCALE = Math.pow(10, 17);
 	
+	public int r = 255;
+	public int g = 255;
+	public int b = 255;
+	
 	private int height;
 	private int width;
 	private int iterations;
@@ -31,6 +35,9 @@ public class Parameters {
 	
 	public Parameters clone() {
 		Parameters parameters = new Parameters(null);
+		parameters.setB(b);
+		parameters.setR(r);
+		parameters.setG(g);
 		parameters.setX1(x1);
 		parameters.setX2(x2);
 		parameters.setY1(y1);
@@ -90,7 +97,8 @@ public class Parameters {
 				String.format("x1: %,.15f; x2: %,.15f;\ny1: %,.15f; y2: %,.15f;\n", x1, x2, y1, y2)+
 				String.format("center: %,.15f; %,.15f;\n\n", centerX(), centerY())+
 				String.format("iterations: %d\n", iterations)+
-				String.format("scale: %,.0f", scale);
+				String.format("scale: %,.0f\n\n", scale)+
+				String.format("rgb: %s; %s; %s", r, g, b);
 	}
 	
 	public void reduce(Rectangle rect) {

@@ -22,7 +22,7 @@ public class ParametersDialog extends MessageDialog {
 	}
 
 	protected Point getInitialSize() {
-		return new Point(400, 300);
+		return new Point(400, 330);
 	}
 	
 	protected void configureShell(Shell newShell) {

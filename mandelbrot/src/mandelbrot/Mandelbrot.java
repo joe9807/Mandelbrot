@@ -14,7 +14,9 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.PaletteData;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.widgets.ColorDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
@@ -87,7 +89,13 @@ public class Mandelbrot {
 	
 	private void reset() {
 		images.clear();
-		parameters = new Parameters(shell.getDisplay().getPrimaryMonitor().getClientArea());
+		Parameters newParameters = new Parameters(shell.getDisplay().getPrimaryMonitor().getClientArea());
+		if (parameters != null) {
+			newParameters.setB(parameters.getB());
+			newParameters.setG(parameters.getG());
+			newParameters.setR(parameters.getR());
+		}
+		parameters = newParameters;
 		shell.setBounds(0, 0, parameters.getWidth(), parameters.getHeight());
 		title = new MandelbrotTitle(shell, parameters);
 		createAndDrawImage(true);
@@ -121,6 +129,29 @@ public class Mandelbrot {
 	
 	private void setMenu() {
 		Menu popupMenu = new Menu(label);
+		
+		MenuItem colorPick = new MenuItem(popupMenu, SWT.NONE);
+		colorPick.setText(Constants.COLOR_PICK);
+		colorPick.addSelectionListener(new SelectionListener() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				ColorDialog colorDialog = new ColorDialog(shell);
+				colorDialog.setRGB(new RGB(parameters.getR(), parameters.getG(), parameters.getB()));
+	            colorDialog.setText("Select a Color");
+	            
+	            RGB rgb = colorDialog.open();
+	            if (rgb != null) {
+	            	parameters.setR(rgb.red);
+	            	parameters.setG(rgb.green);
+	            	parameters.setB(rgb.blue);
+	            	
+	            	createAndDrawImage(true);
+	            }
+			}
+
+			public void widgetDefaultSelected(SelectionEvent e) {}
+	    });
+		
 		MenuItem resetItems = new MenuItem(popupMenu, SWT.NONE);
 	    resetItems.setText(Constants.RESET_TEXT);
 	    resetItems.addSelectionListener(new SelectionListener() {
@@ -188,7 +219,11 @@ public class Mandelbrot {
 						if (MessageDialog.openConfirm(shell, Constants.PARAMETERS_TITLE, parameters.toString()+"\n\nPress OK to start rendering.")){
 							playSet();
 						} else {
-							reset();
+							if (MessageDialog.openConfirm(shell, Constants.SAVE_TITLE, Constants.SAVE_MESSAGE)) {
+								Utils.saveImages(images, title);
+							} else {
+								reset();
+							}
 						}
 					}
 				}
@@ -231,13 +266,12 @@ public class Mandelbrot {
 	}
 
 	private void mandelbrot(ImageData imageData) {
-		for (int x=0;x<imageData.width;x++) {
-			final int xx = x;
-			final double unScaledX = parameters.getUnScaledX(xx);
+		IntStream.range(0, imageData.width).parallel().forEach(x->{
+			double unScaledX = parameters.getUnScaledX(x);
 			IntStream.range(0, imageData.height).parallel().forEach(y->{
-				imageData.setPixel(xx, y, Utils.getColor(getPointIterations(unScaledX, parameters.getUnScaledY(y)), parameters.getIterations()));
+				imageData.setPixel(x, y, Utils.getColor(getPointIterations(unScaledX, parameters.getUnScaledY(y)), parameters));
 			});
-		}
+		});
 	}
 	
 	private int getPointIterations(double x, double y) {
