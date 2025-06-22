@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.IntStream;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.swt.SWT;
@@ -13,6 +14,34 @@ import org.eclipse.swt.graphics.ImageLoader;
 import org.eclipse.swt.widgets.Display;
 
 public class Utils {
+	public static void compute(ImageData imageData, Parameters parameters){
+		IntStream.range(0, imageData.width).parallel().forEach(x->{
+			double unScaledX = parameters.getUnScaledX(x);
+			IntStream.range(0, imageData.height).parallel().forEach(y->{
+				int color = Utils.getColor(Utils.getPointIterations(unScaledX, parameters.getUnScaledY(y), parameters), parameters);
+				imageData.setPixel(x, y, color);
+			});
+		});
+	}
+
+	public static int getPointIterations(double x, double y, Parameters parameters) {
+		double xn = x;
+		double yn = y;
+		double module = 0;
+		int iterations = 0;
+
+		for (;iterations<parameters.getIterations();iterations++) {
+			double xx = xn*xn;
+			double yy = yn*yn;
+			if ((module=xx+yy)>4) return iterations;//definitely not in set
+
+			yn = 2*xn*yn+y;
+			xn = xx-yy+x;
+		}
+
+		return module<4?0:iterations;//in set/not in set
+	}
+
 	public static int getColor(int iterations, Parameters parameters) {
 		if (iterations > 0) {//near to the set
 			int r = iterations*parameters.getR()/parameters.getIterations();
@@ -72,7 +101,7 @@ public class Utils {
 		
 		File sets = new File("sets");
 		sets.mkdir();
-		int max = Arrays.asList(sets.listFiles()).stream().map(imageDir->{
+		int max = Arrays.stream(sets.listFiles()).map(imageDir->{
 			String number = imageDir.getName().replaceAll("set", StringUtils.EMPTY);
 			return Integer.valueOf(number);
 		}).max(Integer::compare).orElse(0);
@@ -83,7 +112,7 @@ public class Utils {
 		ImageLoader saver = new ImageLoader();
 		AtomicInteger pos = new AtomicInteger(0);
 		
-		images.stream().forEach(image->{
+		images.forEach(image->{
 			Display.getDefault().asyncExec(new Runnable() {
 				@Override
 				public void run() {

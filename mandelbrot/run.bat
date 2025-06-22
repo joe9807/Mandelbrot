@@ -1,1 +1,1 @@
-cmd /c java -Djava.util.concurrent.ForkJoinPool.common.parallelism=50 -cp "target/mandelbrot-0.0.1-SNAPSHOT-jar-with-dependencies.jar" mandelbrot.Mandelbrot
+start cmd /c java -Djava.util.concurrent.ForkJoinPool.common.parallelism=50 -cp "target/mandelbrot-0.0.1-SNAPSHOT-jar-with-dependencies.jar" mandelbrot.Mandelbrot

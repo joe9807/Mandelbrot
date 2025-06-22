@@ -1,5 +1,4 @@
 package mandelbrot;
-
 import org.eclipse.swt.graphics.Rectangle;
 
 import lombok.Data;
@@ -14,7 +13,7 @@ public class Parameters {
 	
 	private int height;
 	private int width;
-	private int iterations;
+	public int iterations;
 
 	private double scale;
 	private double x1;
@@ -92,7 +91,7 @@ public class Parameters {
 	}
 	
 	public String toString() {
-		return String.format("width: %s; height: %s; Shell Ratio: %,.10f;\n", width, height, Double.valueOf(width)/height)+
+		return String.format("width: %s; height: %s; Shell Ratio: %,.10f;\n", width, height, (double) width /height)+
 				String.format("width: %s; height: %s; Set Ratio: %,.10f;\n\n", width(), height(), width()/height())+
 				String.format("x1: %,.15f; x2: %,.15f;\ny1: %,.15f; y2: %,.15f;\n", x1, x2, y1, y2)+
 				String.format("center: %,.15f; %,.15f;\n\n", centerX(), centerY())+
@@ -129,7 +128,7 @@ public class Parameters {
 			y2 = yn1;
 		}
 		
-		if (rectRatio()>(Double.valueOf(screenResolution.width)/screenResolution.height)) {
+		if (rectRatio()>((double) screenResolution.width /screenResolution.height)) {
 			init(screenResolution.width, 0);
 		} else {
 			init(0, screenResolution.height);
@@ -141,7 +140,7 @@ public class Parameters {
 	public void increase(double newCenterX, double newCenterY) {
 		double tox = newCenterX<centerX()?newCenterX-x1:x2-newCenterX;
 		double toy = newCenterY<centerY()?newCenterY-y1:y2-newCenterY;
-		double ratio = Double.valueOf(width)/height;
+		double ratio = (double) width /height;
 		
 		if ((tox/toy)>ratio) {
 			//count height then width

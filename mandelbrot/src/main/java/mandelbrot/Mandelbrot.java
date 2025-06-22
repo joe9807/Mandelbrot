@@ -3,7 +3,6 @@ package mandelbrot;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.IntStream;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
@@ -21,7 +20,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
-import org.eclipse.swt.widgets.Shell; 
+import org.eclipse.swt.widgets.Shell;
 
 public class Mandelbrot {
 	private static Mandelbrot instance;
@@ -29,12 +28,14 @@ public class Mandelbrot {
 	private MandelbrotTitle title;
 	private Label label;
 	private Shell shell;
-	private List<Image> images = new ArrayList<Image>();
+	private final List<Image> images = new ArrayList<>();
 	
 	private double xn1;
 	private double yn1;
 	private double xn2;
 	private double yn2;
+
+	private LANG lang = LANG.JAVA;
 	
 	private static synchronized Mandelbrot getInstance() {
 		if (instance == null) instance = new Mandelbrot();
@@ -98,6 +99,7 @@ public class Mandelbrot {
 		parameters = newParameters;
 		shell.setBounds(0, 0, parameters.getWidth(), parameters.getHeight());
 		title = new MandelbrotTitle(shell, parameters);
+		title.setLang(lang);
 		createAndDrawImage(true);
 	}
 	
@@ -201,8 +203,13 @@ public class Mandelbrot {
 	    });
 	    
 	    label.setMenu(popupMenu);
-	    
+	    choice();
 	    resetItems.notifyListeners(SWT.Selection, null);
+	}
+
+	private void choice(){
+		MessageDialog dialog = new MessageDialog(shell, Constants.APP_LANG, null, Constants.SELECT_LANG, MessageDialog.INFORMATION, Constants.LANG_BUTTONS, 0);
+		lang = dialog.open() == 0? LANG.JAVA:LANG.KOTLIN;
 	}
 	
 	private void createAndPlaySet() {
@@ -232,7 +239,7 @@ public class Mandelbrot {
 	}
 	
 	private void playSet() {
-		images.stream().forEach(image->{
+		images.forEach(image->{
 			Display.getDefault().asyncExec(new Runnable() {
 				public void run() {
 					label.setImage(image);
@@ -255,7 +262,7 @@ public class Mandelbrot {
 		ImageData imageData = new ImageData(parameters.getWidth(), parameters.getHeight(), 24, new PaletteData(0xFF , 0xFF00 , 0xFF0000));
 		
 		Date startDate = new Date();
-		mandelbrot(imageData);
+		mandelbrot(imageData, parameters);
 		title.setImagesTitle(images.size(), Utils.getTimeElapsed(new Date().getTime()-startDate.getTime()));
 		
 		Image image = new Image(shell.getDisplay(), imageData);
@@ -265,30 +272,11 @@ public class Mandelbrot {
 		return image;
 	}
 
-	private void mandelbrot(ImageData imageData) {
-		IntStream.range(0, imageData.width).parallel().forEach(x->{
-			double unScaledX = parameters.getUnScaledX(x);
-			IntStream.range(0, imageData.height).parallel().forEach(y->{
-				imageData.setPixel(x, y, Utils.getColor(getPointIterations(unScaledX, parameters.getUnScaledY(y)), parameters));
-			});
-		});
-	}
-	
-	private int getPointIterations(double x, double y) {
-		double xn = x;
-		double yn = y;
-		double module = 0;
-		int iterations = 0;
-		
-		for (;iterations<parameters.getIterations();iterations++) {
-			double xx = xn*xn;
-			double yy = yn*yn;
-			if ((module=xx+yy)>4) return iterations;//definitely not in set
-			
-			yn = 2*xn*yn+y;
-			xn = xx-yy+x;
+	private void mandelbrot(ImageData imageData, Parameters parameters) {
+		if (lang == LANG.JAVA){
+			Utils.compute(imageData, parameters);
+		} else if (lang == LANG. KOTLIN){
+			MKotlin.compute(imageData, parameters);
 		}
-		
-		return module<4?0:iterations;//in set/not in set
 	}
 }

@@ -4,3 +4,11 @@
 /.settings/
 /target/
 /sets/
+/.idea/checkstyle-idea.xml
+/.idea/codeStyles/codeStyleConfig.xml
+/.idea/compiler.xml
+/.idea/jarRepositories.xml
+/.idea/kotlinc.xml
+/.idea/vcs.xml
+/.idea/codeStyles/Project.xml
+/.idea/misc.xml
