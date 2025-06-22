@@ -47,10 +47,10 @@ public class Mandelbrot {
 	}
 
 	public static void main(String[] args) {
-		getInstance().run();
+		getInstance().run(args);
 	}
 	
-	private void run () {
+	private void run (String[] args) {
 		shell = new Shell(new Display(), SWT.CLOSE | SWT.RESIZE);
 		shell.setLayout(new FillLayout());
 		label = new Label(shell, SWT.NONE);
@@ -78,7 +78,7 @@ public class Mandelbrot {
 			}
         });
         
-        setMenu();
+        setMenu(args);
         shell.open();
         
 		while (!shell.isDisposed()) {
@@ -129,7 +129,7 @@ public class Mandelbrot {
 		}
 	}
 	
-	private void setMenu() {
+	private void setMenu(String[] args) {
 		Menu popupMenu = new Menu(label);
 		
 		MenuItem colorPick = new MenuItem(popupMenu, SWT.NONE);
@@ -196,6 +196,10 @@ public class Mandelbrot {
 				}
 				
 				reset();
+				if (args != null && args.length != 0) {
+					xn2 = Double.parseDouble(args[0].split("=")[1]);
+					yn2 = Double.parseDouble(args[1].split("=")[1]);
+				}
 				createAndPlaySet(xn2, yn2);
 			}
 
@@ -204,7 +208,12 @@ public class Mandelbrot {
 	    
 	    label.setMenu(popupMenu);
 	    choice();
-	    resetItems.notifyListeners(SWT.Selection, null);
+
+		if (args != null && args.length != 0){
+			menuItemGoHere.notifyListeners(SWT.Selection, null);
+		} else {
+			resetItems.notifyListeners(SWT.Selection, null);
+		}
 	}
 
 	private void choice(){
@@ -224,8 +233,10 @@ public class Mandelbrot {
 					images.add(createAndDrawImage(false));
 					
 					if (parameters.isTheEnd()) {
-						if (MessageDialog.openConfirm(shell, Constants.PARAMETERS_TITLE, parameters.toString()+"\n\nTotal time elapsed: "+Utils.getTimeElapsed(new Date().getTime()-startDate.getTime())
-								+"\n\nPress OK to start rendering.")){
+						String timeElapsed = Utils.getTimeElapsed(new Date().getTime()-startDate.getTime());
+						System.out.println(lang+" "+parameters.centerToString()+" "+timeElapsed);
+
+						if (MessageDialog.openConfirm(shell, Constants.PARAMETERS_TITLE, parameters.toString()+"\n\nTotal time elapsed: "+timeElapsed+"\n\nPress OK to start rendering.")){
 							playSet();
 						} else {
 							if (MessageDialog.openConfirm(shell, Constants.SAVE_TITLE, Constants.SAVE_MESSAGE)) {

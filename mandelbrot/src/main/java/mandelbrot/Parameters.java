@@ -3,6 +3,8 @@ import org.eclipse.swt.graphics.Rectangle;
 
 import lombok.Data;
 
+import java.util.Locale;
+
 @Data
 public class Parameters {
 	private static final double MAX_SCALE = Math.pow(10, 17);
@@ -89,12 +91,16 @@ public class Parameters {
 	private double rectRatio() {
 		return width()/height();
 	}
+
+	public String centerToString() {
+		return String.format(Locale.US, "centerX=%.15f centerY=%.15f", centerX(), centerY());
+	}
 	
 	public String toString() {
-		return String.format("width: %s; height: %s; Shell Ratio: %,.10f;\n", width, height, (double) width /height)+
-				String.format("width: %s; height: %s; Set Ratio: %,.10f;\n\n", width(), height(), width()/height())+
-				String.format("x1: %,.15f; x2: %,.15f;\ny1: %,.15f; y2: %,.15f;\n", x1, x2, y1, y2)+
-				String.format("center: %,.15f; %,.15f;\n\n", centerX(), centerY())+
+		return String.format(Locale.US, "width: %s; height: %s; Shell Ratio: %,.10f;\n", width, height, (double) width /height)+
+				String.format(Locale.US, "width: %s; height: %s; Set Ratio: %,.10f;\n\n", width(), height(), width()/height())+
+				String.format(Locale.US, "x1: %,.15f; x2: %,.15f;\ny1: %,.15f; y2: %,.15f;\n", x1, x2, y1, y2)+
+				String.format(Locale.US, "center: %,.15f; %,.15f;\n\n", centerX(), centerY())+
 				String.format("iterations: %d\n", iterations)+
 				String.format("scale: %,.0f\n\n", scale)+
 				String.format("rgb: %s; %s; %s", r, g, b);
