@@ -213,6 +213,7 @@ public class Mandelbrot {
 	}
 	
 	private void createAndPlaySet() {
+		Date startDate = new Date();
 		for (int i=0;i<1000;i++) {
 			Display.getDefault().asyncExec(new Runnable() {
 				@Override
@@ -223,7 +224,8 @@ public class Mandelbrot {
 					images.add(createAndDrawImage(false));
 					
 					if (parameters.isTheEnd()) {
-						if (MessageDialog.openConfirm(shell, Constants.PARAMETERS_TITLE, parameters.toString()+"\n\nPress OK to start rendering.")){
+						if (MessageDialog.openConfirm(shell, Constants.PARAMETERS_TITLE, parameters.toString()+"\n\nTotal time elapsed: "+Utils.getTimeElapsed(new Date().getTime()-startDate.getTime())
+								+"\n\nPress OK to start rendering.")){
 							playSet();
 						} else {
 							if (MessageDialog.openConfirm(shell, Constants.SAVE_TITLE, Constants.SAVE_MESSAGE)) {
