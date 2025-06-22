@@ -16,7 +16,7 @@ import org.eclipse.swt.widgets.Display;
 public class Utils {
 	public static void compute(ImageData imageData, Parameters parameters){
 		IntStream.range(0, imageData.width).parallel().forEach(x->{
-			IntStream.range(0, imageData.height).parallel().forEach(y->{
+			IntStream.range(0, imageData.height).forEach(y->{
 				imageData.setPixel(x, y, Utils.getColor(Utils.getPointIterations(parameters.getUnScaledX(x), parameters.getUnScaledY(y), parameters), parameters));
 			});
 		});
